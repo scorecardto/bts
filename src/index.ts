@@ -1,11 +1,14 @@
 // src/index.js
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
+import joinSchool from "./controllers/school/joinSchool";
 
 dotenv.config();
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
+
+app.post("/v1/school/join", joinSchool);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
