@@ -25,6 +25,7 @@ function initializeUserClassModel(sequelize: Sequelize) {
         type: DataTypes.INTEGER,
         primaryKey: true,
         allowNull: false,
+        autoIncrement: true,
       },
       user: {
         type: DataTypes.STRING,
