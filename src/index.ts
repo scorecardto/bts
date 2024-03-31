@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import joinSchool from "./controllers/school/joinSchool";
 import suggestFriends from "./controllers/friends/suggestions";
 import formidableMiddleware from "express-formidable";
+import initializeModel from "./models";
 
 dotenv.config();
 
@@ -20,6 +21,10 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
 });
 
-app.listen(port, () => {
-  console.log(`[server]: Server is running at http://localhost:${port}`);
+const db = initializeModel().sync();
+
+db.then(() => {
+  app.listen(port, () => {
+    console.log(`[server]: Server is running at http://localhost:${port}`);
+  });
 });
