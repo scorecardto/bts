@@ -15,6 +15,7 @@ class Friendship extends Model<
   declare from_uid: string;
   declare to_uid: string;
   declare blocked: boolean;
+  declare active: boolean;
 }
 
 function initializeFriendshipModel(sequelize: Sequelize) {
@@ -32,6 +33,10 @@ function initializeFriendshipModel(sequelize: Sequelize) {
       },
       to_uid: {
         type: DataTypes.STRING,
+        allowNull: false,
+      },
+      active: {
+        type: DataTypes.BOOLEAN,
         allowNull: false,
       },
       blocked: {
