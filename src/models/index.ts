@@ -5,6 +5,7 @@ import { initializeUserClassModel } from "./UserClass";
 import { initializeSchoolModel } from "./School";
 import { initializeFriendRequestModel } from "./FriendRequest";
 import { initializeFriendshipModel } from "./Friendship";
+import { initializeClubModel } from "./Club";
 
 export default function initializeModel() {
   const {
@@ -31,6 +32,7 @@ export default function initializeModel() {
   initializeUserClassModel(sequelize);
   initializeFriendRequestModel(sequelize);
   initializeFriendshipModel(sequelize);
+  initializeClubModel(sequelize);
 
   return sequelize;
 }

@@ -26,7 +26,7 @@ app.post("/v1/friends/unblock", unblockFriend);
 app.post("/v1/friends/block", removeFriend);
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("Express + TypeScript Server");
+  res.send("Express + TypeScript Server (2)");
 });
 
 const db = initializeModel().sync();
