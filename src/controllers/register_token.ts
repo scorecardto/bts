@@ -7,7 +7,7 @@ export default async function registerToken(req: Request, res: Response) {
     if (!user) return;
 
     const token = (req.fields?.pushToken ?? "") as string;
-    if (!token || !/ExponentPushToken[a-zA-Z]/.test(token)) {
+    if (!token || !/ExponentPushToken\[[a-zA-Z0-9]{22}]/.test(token)) {
         res.status(400).send("Invalid push token");
         return;
     }
