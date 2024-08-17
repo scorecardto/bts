@@ -28,7 +28,7 @@ function initializeClubModel(sequelize: Sequelize) {
         type: DataTypes.STRING,
         references: {
           model: "schools",
-          key: "name",
+          key: "unique_name",
         },
         allowNull: false,
       },
