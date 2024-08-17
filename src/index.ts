@@ -31,13 +31,13 @@ app.post("/v1/images/upload", uploadImage);
 app.get("/v1/images/get/:id", getImage);
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("Express + TypeScript Server (3)");
+  res.send("Express + TypeScript Server (4)");
 });
 
 // const db = initializeModel().sync();
 
 // db.then(() => {
-  app.listen(port, () => {
-    console.log(`[server]: Server is running at http://localhost:${port}`);
-  });
+app.listen(port, () => {
+  console.log(`[server]: Server is running at http://localhost:${port}`);
+});
 // });
