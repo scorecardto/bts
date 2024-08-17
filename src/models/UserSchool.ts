@@ -17,6 +17,7 @@ class UserSchool extends Model<
   declare real_last_name?: string;
   declare np_grade_level?: string;
   declare school: string;
+  declare schedule?: string;
 }
 
 function initializeUserSchoolModel(sequelize: Sequelize) {
@@ -49,8 +50,16 @@ function initializeUserSchoolModel(sequelize: Sequelize) {
       np_grade_level: {
         type: DataTypes.STRING,
       },
+      schedule: {
+        type: DataTypes.STRING,
+      },
     },
-    { sequelize, tableName: "user_schools", modelName: "UserSchool" }
+    {
+      sequelize,
+      tableName: "user_schools",
+      modelName: "UserSchool",
+      paranoid: true,
+    }
   );
 }
 

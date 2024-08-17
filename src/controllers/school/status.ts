@@ -3,10 +3,8 @@ import requireAuth from "../../auth/requireAuth";
 import { School } from "../../models/School";
 import { UserSchool } from "../../models/UserSchool";
 import { UserClass } from "../../models/UserClass";
-import { InferAttributes, InferCreationAttributes } from "sequelize";
-import { NullishPropertiesOf } from "sequelize/types/utils";
 
-export default async function joinSchool(req: Request, res: Response) {
+export default async function updateSchoolStatus(req: Request, res: Response) {
   const {
     schoolName,
     districtHost,
@@ -40,24 +38,57 @@ export default async function joinSchool(req: Request, res: Response) {
     });
   }
 
-  const userSchool = await UserSchool.create({
-    uid: user.uid,
+  const existingUserSchool = await UserSchool.findOne({
+    where: [
+      {
+        uid: user.uid,
+      },
+    ],
+  });
+
+  const schoolFields = {
     school: uniqueSchoolName,
     first_name: `${studentFirstName}`,
     last_name: `${studentLastName}`,
     real_first_name: `${realFirstName}`,
     real_last_name: `${realLastName}`,
     np_grade_level: `${gradeLevel}`,
-  });
+    schedule: `${schedule}`,
+  };
 
-  await UserClass.bulkCreate(
-    JSON.parse(`${schedule}`).map((classInfo: any): any => ({
-      user: user.uid,
-      course_key: classInfo.course_key,
-      period: classInfo.period,
-      room_number: classInfo.room_number,
-    }))
-  );
+  let shouldAddSchedule = !existingUserSchool;
+  let shouldReplaceSchedule = false;
+
+  if (existingUserSchool) {
+    if (existingUserSchool.schedule !== schedule) {
+      shouldAddSchedule = true;
+      shouldReplaceSchedule = true;
+    }
+    await existingUserSchool.update(schoolFields);
+  } else {
+    await UserSchool.create({
+      uid: user.uid,
+      ...schoolFields,
+    });
+  }
+
+  if (shouldReplaceSchedule) {
+    await UserClass.destroy({
+      where: {
+        user: user.uid,
+      },
+    });
+  }
+  if (shouldAddSchedule) {
+    await UserClass.bulkCreate(
+      JSON.parse(`${schedule}`).map((classInfo: any): any => ({
+        user: user.uid,
+        course_key: classInfo.course_key,
+        period: classInfo.period,
+        room_number: classInfo.room_number,
+      }))
+    );
+  }
 
   res.send({
     result: "success",
