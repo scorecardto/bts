@@ -34,10 +34,10 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server (4)");
 });
 
-// const db = initializeModel().sync();
+const db = initializeModel().sync();
 
-// db.then(() => {
-app.listen(port, () => {
-  console.log(`[server]: Server is running at http://localhost:${port}`);
+db.then(() => {
+  app.listen(port, () => {
+    console.log(`[server]: Server is running at http://localhost:${port}`);
+  });
 });
-// });
