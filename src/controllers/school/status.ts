@@ -85,7 +85,9 @@ export default async function updateSchoolStatus(req: Request, res: Response) {
         user: user.uid,
         course_key: classInfo.course_key,
         period: classInfo.period,
-        room_number: classInfo.room_number,
+        // room_number: classInfo.room_number,
+        name: classInfo.name,
+        teacher: classInfo.teacher,
       }))
     );
   }

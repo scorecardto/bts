@@ -15,7 +15,8 @@ class UserClass extends Model<
   declare user: string;
   declare course_key?: string;
   declare period?: string;
-  declare room_number?: string;
+  declare name?: string;
+  declare teacher?: string;
 }
 
 function initializeUserClassModel(sequelize: Sequelize) {
@@ -37,7 +38,10 @@ function initializeUserClassModel(sequelize: Sequelize) {
       period: {
         type: DataTypes.STRING,
       },
-      room_number: {
+      name: {
+        type: DataTypes.STRING,
+      },
+      teacher: {
         type: DataTypes.STRING,
       },
     },
