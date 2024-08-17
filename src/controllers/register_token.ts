@@ -6,6 +6,12 @@ export default async function registerToken(req: Request, res: Response) {
     const user = await requireAuth(req, res);
     if (!user) return;
 
-    getFirebase().firestore().collection("pushTokens").doc(user.uid).set({ token: req.body.pushToken });
+    const token = (req.fields?.pushToken ?? "") as string;
+    if (!token || !/ExponentPushToken[a-zA-Z]/.test(token)) {
+        res.status(400).send("Invalid push token");
+        return;
+    }
+
+    getFirebase().firestore().collection("pushTokens").doc(user.uid).set({ token });
     res.send({ result: "success" });
 }
