@@ -1,6 +1,7 @@
 import {Request, Response} from "express";
 import requireAuth from "../../auth/requireAuth";
 import getFirebase from "../../firebase/getFirebase";
+import {randomUUID} from "node:crypto";
 
 export const magicBytes: { [type: string]: number[]} = {
     png: [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A],
@@ -16,29 +17,25 @@ export default async function uploadImage(req: Request, res: Response) {
   const user = await requireAuth(req, res);
   if (!user) return;
 
-  const id = (req.fields?.id ?? "") as string;
+  const id = randomUUID();
   const file = getFirebase().storage().bucket().file(id);
 
-  if (await file.exists()) {
-    res.status(400).send("Image already exists");
+  const image = req.files?.image as unknown as File;
+  if (image == undefined) {
+    res.status(400).send("No file upload found");
     return;
-  } else{
-    const image = req.files?.image as unknown as File;
-    if (image == undefined) {
-      res.status(400).send("No file upload found");
-      return;
-    }
-
-    const data = Buffer.from(await image.arrayBuffer());
-    if (!Object.values(magicBytes).find(d => data.indexOf(Uint8Array.from(d)) == 0)) {
-      res.status(400).send("Invalid image format");
-      return;
-    }
-
-    await file.save(data)
-
-    res.send({
-      result: "success"
-    });
   }
+
+  const data = Buffer.from(await image.arrayBuffer());
+  if (!Object.values(magicBytes).find(d => data.indexOf(Uint8Array.from(d)) == 0)) {
+    res.status(400).send("Invalid image format");
+    return;
+  }
+
+  await file.save(data)
+
+  res.send({
+    result: "success",
+    id: id,
+  });
 }
