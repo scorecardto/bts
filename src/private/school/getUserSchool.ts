@@ -9,9 +9,5 @@ export default async function getUserSchool(uid: string): Promise<string> {
   const snapshot = await userSchoolInfo.doc(uid).get();
   const data = snapshot.data();
 
-  if (!data || !data.schoolName) {
-    throw new Error("User not found");
-  }
-
-  return data.schoolName;
+  return data?.schoolName || null;
 }

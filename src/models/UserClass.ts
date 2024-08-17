@@ -41,7 +41,12 @@ function initializeUserClassModel(sequelize: Sequelize) {
         type: DataTypes.STRING,
       },
     },
-    { sequelize, tableName: "user_classes", modelName: "UserClass" }
+    {
+      sequelize,
+      tableName: "user_classes",
+      modelName: "UserClass",
+      paranoid: true,
+    }
   );
 }
 
