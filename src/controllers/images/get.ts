@@ -14,14 +14,6 @@ export default async function getImage(req: Request, res: Response) {
         res.status(404).send("Image not found");
         return;
     } else{
-        const image = (await file.download())[0];
-
-        const type = Object.keys(magicBytes).find(type => image.indexOf(Uint8Array.from(magicBytes[type])) == 0);
-        if (!type) {
-            res.status(500).send("Invalid image format");
-            return;
-        }
-
-        res.contentType(type).send(image);
+        res.contentType((await file.getMetadata())[0].contentType ?? "").send((await file.download())[0]);
     }
 }
