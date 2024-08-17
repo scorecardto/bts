@@ -11,6 +11,7 @@ import removeFriend from "./controllers/friends/remove";
 import updateSchoolStatus from "./controllers/school/status";
 import uploadImage from "./controllers/images/upload";
 import getImage from "./controllers/images/get";
+import registerToken from "./controllers/register_token";
 
 dotenv.config();
 
@@ -29,6 +30,8 @@ app.post("/v1/friends/block", removeFriend);
 
 app.post("/v1/images/upload", uploadImage);
 app.get("/v1/images/get/:id", getImage);
+
+app.post("/v1/register_token", registerToken);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server (4)");
