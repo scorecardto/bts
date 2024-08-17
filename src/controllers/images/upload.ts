@@ -29,6 +29,11 @@ export default async function uploadImage(req: Request, res: Response) {
 
   const data = Buffer.from(await image.arrayBuffer());
 
+  if (data.byteLength > 5 * 1024 * 1024) { // 5 MB
+    res.status(400).send("Image too large");
+    return;
+  }
+
   const type = Object.keys(magicBytes).find(type => data.indexOf(Uint8Array.from(magicBytes[type])) == 0);
   if (!type) {
     res.status(400).send("Invalid image format");
