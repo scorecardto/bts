@@ -2,8 +2,9 @@ import {Request, Response} from "express";
 import requireAuth from "../../auth/requireAuth";
 import getFirebase from "../../firebase/getFirebase";
 import {randomUUID} from "node:crypto";
+import mime from "mime";
 
-export const magicBytes: { [type: string]: number[]} = {
+const magicBytes: { [type: string]: number[]} = {
     png: [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A],
     jpeg: [0xFF, 0xD8, 0xFF],
     // gif: [0x47, 0x49, 0x46, 0x38, 0x39, 0x61],
@@ -27,12 +28,15 @@ export default async function uploadImage(req: Request, res: Response) {
   }
 
   const data = Buffer.from(await image.arrayBuffer());
-  if (!Object.values(magicBytes).find(d => data.indexOf(Uint8Array.from(d)) == 0)) {
+
+  const type = Object.keys(magicBytes).find(type => data.indexOf(Uint8Array.from(magicBytes[type])) == 0);
+  if (!type) {
     res.status(400).send("Invalid image format");
     return;
   }
 
   await file.save(data)
+  await file.setMetadata({contentType: mime.lookup(type)})
 
   res.send({
     result: "success",
