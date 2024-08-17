@@ -9,6 +9,8 @@ import listFriends from "./controllers/friends/list";
 import unblockFriend from "./controllers/friends/unblock";
 import removeFriend from "./controllers/friends/remove";
 import updateSchoolStatus from "./controllers/school/status";
+import uploadImage from "./controllers/images/upload";
+import getImage from "./controllers/images/get";
 
 dotenv.config();
 
@@ -25,14 +27,17 @@ app.post("/v1/friends/suggestions", suggestFriends);
 app.post("/v1/friends/unblock", unblockFriend);
 app.post("/v1/friends/block", removeFriend);
 
+app.post("/v1/images/upload", uploadImage);
+app.get("/v1/images/get/:id", getImage);
+
 app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server (3)");
 });
 
-const db = initializeModel().sync();
+// const db = initializeModel().sync();
 
-db.then(() => {
+// db.then(() => {
   app.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);
   });
-});
+// });
