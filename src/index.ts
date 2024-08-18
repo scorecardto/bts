@@ -20,6 +20,7 @@ const port = process.env.PORT || 3000;
 app.use(formidableMiddleware());
 
 app.post("/v1/school/status", updateSchoolStatus);
+app.post("/v1/clubs/checkTicker", updateSchoolStatus);
 
 app.post("/v1/friends/add", addFriend);
 app.post("/v1/friends/list", listFriends);

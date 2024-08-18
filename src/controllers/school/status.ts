@@ -3,6 +3,8 @@ import requireAuth from "../../auth/requireAuth";
 import { School } from "../../models/School";
 import { UserSchool } from "../../models/UserSchool";
 import { UserClass } from "../../models/UserClass";
+import { Club } from "../../models/Club";
+import { ClubMembership } from "../../models/ClubMembership";
 
 export default async function updateSchoolStatus(req: Request, res: Response) {
   const {
@@ -92,7 +94,56 @@ export default async function updateSchoolStatus(req: Request, res: Response) {
     );
   }
 
+  const clubs: {
+    name: string;
+    posts: string[];
+    id: number;
+    owned: boolean;
+  }[] = [];
+
+  const ownedClubs = await Club.findAll({
+    where: [
+      {
+        owner: user.uid,
+      },
+    ],
+  });
+
+  const joinedClubs = await Club.findAll({
+    include: [
+      {
+        model: ClubMembership,
+        where: { phone_number: user.phone_number },
+      },
+    ],
+  });
+
+  clubs.push(
+    ...ownedClubs.map((c) => {
+      return {
+        name: c.name,
+        posts: [],
+        id: c.id,
+        owned: true,
+      };
+    })
+  );
+
+  clubs.push(
+    ...joinedClubs.map((c) => {
+      return {
+        name: c.name,
+        posts: [],
+        id: c.id,
+        owned: false,
+      };
+    })
+  );
+
   res.send({
     result: "success",
+    status: {
+      clubs,
+    },
   });
 }
