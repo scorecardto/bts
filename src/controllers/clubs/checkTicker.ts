@@ -3,12 +3,21 @@ import requireAuth from "../../auth/requireAuth";
 import { Club } from "../../models/Club";
 import getUserSchool from "../../private/school/getUserSchool";
 import { School } from "../../models/School";
+import {
+  RegExpMatcher,
+  TextCensor,
+  englishDataset,
+  englishRecommendedTransformers,
+} from "obscenity";
 
-export default async function createClub(req: Request, res: Response) {
+export default async function checkTicker(req: Request, res: Response) {
   const user = await requireAuth(req, res);
   if (!user) return;
 
-  const name = req.fields?.name;
+  const matcher = new RegExpMatcher({
+    ...englishDataset.build(),
+    ...englishRecommendedTransformers,
+  });
   const ticker = `${req.fields?.ticker}`;
 
   if (ticker.length > 10) {
@@ -37,6 +46,11 @@ export default async function createClub(req: Request, res: Response) {
   const uid = user.uid;
   const schoolName = await getUserSchool(uid);
 
+  if (!schoolName) {
+    res.status(400).send("User not enrolled in Scorecard Social Services");
+    return;
+  }
+
   const existing = await Club.findOne({
     where: [
       {
@@ -46,7 +60,7 @@ export default async function createClub(req: Request, res: Response) {
     ],
   });
 
-  if (existing) {
+  if (existing || matcher.hasMatch(ticker)) {
     res.send({
       result: "TAKEN",
     });

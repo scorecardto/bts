@@ -10,6 +10,11 @@ export default async function listClubs(req: Request, res: Response) {
   const uid = user.uid;
   const schoolName = await getUserSchool(uid);
 
+  if (!schoolName) {
+    res.status(400).send("User not enrolled in Scorecard Social Services");
+    return;
+  }
+
   const clubs = await Club.findAll({
     where: [
       {

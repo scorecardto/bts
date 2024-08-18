@@ -20,6 +20,7 @@
     "gender-detection-ts": "^1.1.0",
     "mysql2": "^3.9.3",
     "nodemon": "^3.1.4",
+    "obscenity": "^0.4.0",
     "phone": "^3.1.42",
     "sequelize": "^6.37.2",
     "ts-node": "^10.9.2"
