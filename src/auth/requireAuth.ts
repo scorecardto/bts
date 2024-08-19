@@ -6,9 +6,7 @@ const requireAuth = async (
   request: Request,
   response: Response
 ): Promise<DecodedIdToken | null> => {
-  const token = (request.fields?.token ?? "") as string;
-
-  const decodedToken = await checkAuth(token);
+  const decodedToken = await checkAuth(request.headers.authorization ?? "");
 
   if (!decodedToken) {
     response.status(401).send("Unauthorized");

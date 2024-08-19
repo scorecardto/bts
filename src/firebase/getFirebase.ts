@@ -8,6 +8,7 @@ export default function getFirebase() {
     : admin.initializeApp({
         // @ts-ignore
         credential: admin.credential.cert(firebaseConfig),
+        storageBucket: "scorecardto.appspot.com",
       });
 
   return app;
