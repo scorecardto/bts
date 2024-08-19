@@ -19,7 +19,7 @@ export default async function uploadImage(req: Request, res: Response) {
   if (!user) return;
 
   const id = randomUUID();
-  const file = getFirebase().storage().bucket().file(id);
+  const file = getFirebase().storage().bucket().file(`images/${id}`);
 
   const image = req.files?.image as unknown as File;
   if (image == undefined) {
