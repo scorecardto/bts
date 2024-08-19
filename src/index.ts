@@ -18,7 +18,9 @@ dotenv.config();
 const app: Express = express();
 const port = process.env.PORT || 3000;
 
-app.use(formidableMiddleware());
+app.use(formidableMiddleware({
+  maxFileSize: 5 * 1024 * 1024,
+}));
 
 app.post("/v1/school/status", updateSchoolStatus);
 

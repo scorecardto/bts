@@ -3,6 +3,8 @@ import requireAuth from "../../auth/requireAuth";
 import getFirebase from "../../firebase/getFirebase";
 import {randomUUID} from "node:crypto";
 import mime from "mime";
+import {File} from "formidable";
+import fs from "fs";
 
 const magicBytes: { [type: string]: number[]} = {
     png: [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A],
@@ -27,7 +29,8 @@ export default async function uploadImage(req: Request, res: Response) {
     return;
   }
 
-  const data = Buffer.from(await image.arrayBuffer());
+  // @ts-ignore
+  const data = fs.readFileSync(image.path); // claims it's `.filepath`, but it's actually `.path`
 
   if (data.byteLength > 5 * 1024 * 1024) { // 5 MB
     res.status(400).send("Image too large");
