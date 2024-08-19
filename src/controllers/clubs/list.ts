@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import requireAuth from "../../auth/requireAuth";
-import { Club } from "../../models/Club";
+import { Club as ClubModel } from "../../models/Club";
 import getUserSchool from "../../private/school/getUserSchool";
-
+import { Club } from "scorecard-types";
 export default async function listClubs(req: Request, res: Response) {
   const user = await requireAuth(req, res);
   if (!user) return;
@@ -15,12 +15,25 @@ export default async function listClubs(req: Request, res: Response) {
     return;
   }
 
-  const clubs = await Club.findAll({
-    where: [
-      {
-        school: schoolName,
-      },
-    ],
+  const clubs: Club[] = [];
+
+  (
+    await ClubModel.findAll({
+      where: [
+        {
+          school: schoolName,
+        },
+      ],
+    })
+  ).forEach((cm) => {
+    clubs.push({
+      name: cm.name,
+      code: cm.ticker,
+      isMember: false,
+      isOwner: false,
+      memberCount: 0,
+      posts: [],
+    });
   });
 
   res.send({
