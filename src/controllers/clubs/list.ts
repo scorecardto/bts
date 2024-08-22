@@ -3,6 +3,8 @@ import requireAuth from "../../auth/requireAuth";
 import { Club as ClubModel } from "../../models/Club";
 import getUserSchool from "../../private/school/getUserSchool";
 import { Club } from "scorecard-types";
+import { ClubMembership } from "../../models/ClubMembership";
+import { Sequelize } from "sequelize";
 export default async function listClubs(req: Request, res: Response) {
   const user = await requireAuth(req, res);
   if (!user) return;
@@ -24,14 +26,51 @@ export default async function listClubs(req: Request, res: Response) {
           school: schoolName,
         },
       ],
+      include: [
+        {
+          model: ClubMembership,
+          required: false,
+          where: {
+            phone_number: user.phone_number,
+          },
+          attributes: [],
+        },
+      ],
+      attributes: {
+        include: [
+          [
+            Sequelize.literal(`
+          EXISTS (
+            SELECT 1
+            FROM club_memberships AS ClubMembership
+            WHERE ClubMembership.club = Club.id
+            AND ClubMembership.phone_number = '${user.phone_number}'
+          )
+        `),
+            "isMember",
+          ],
+          [
+            Sequelize.literal(`
+              (
+                SELECT COUNT(*)
+                FROM club_memberships AS ClubMembership
+                WHERE ClubMembership.club = Club.id
+              )
+            `),
+            "memberCount",
+          ],
+        ],
+      },
     })
   ).forEach((cm) => {
     clubs.push({
       name: cm.name,
       code: cm.ticker,
-      isMember: false,
-      isOwner: false,
-      memberCount: 0,
+      // @ts-ignore
+      isMember: cm.dataValues.isMember,
+      isOwner: cm.owner === uid,
+      // @ts-ignore
+      memberCount: cm.dataValues.memberCount,
       posts: [],
     });
   });
