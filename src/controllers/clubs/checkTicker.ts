@@ -3,7 +3,6 @@ import requireAuth from "../../auth/requireAuth";
 import { Club } from "../../models/Club";
 import getUserSchool from "../../private/school/getUserSchool";
 import { School } from "../../models/School";
-
 import {
   RegExpMatcher,
   TextCensor,
@@ -11,21 +10,36 @@ import {
   englishRecommendedTransformers,
 } from "obscenity";
 
-export default async function createClub(req: Request, res: Response) {
+export default async function checkTicker(req: Request, res: Response) {
   const user = await requireAuth(req, res);
   if (!user) return;
-
-  const name = req.fields?.name;
 
   const matcher = new RegExpMatcher({
     ...englishDataset.build(),
     ...englishRecommendedTransformers,
   });
   const ticker = `${req.fields?.ticker}`;
+
+  if (ticker.length > 10) {
+    res.send({
+      result: "TOO LONG",
+    });
+    return;
+  }
+
+  if (ticker.length < 2) {
+    res.send({
+      result: "TOO SHORT",
+    });
+    return;
+  }
+
   const pattern = /^[A-Z0-9]{2,10}$/;
 
   if (!pattern.test(ticker)) {
-    res.status(400).send("Inproper ticker format");
+    res.send({
+      result: "INCORRECT FORMAT",
+    });
     return;
   }
 
@@ -47,20 +61,13 @@ export default async function createClub(req: Request, res: Response) {
   });
 
   if (existing || matcher.hasMatch(ticker)) {
-    res.status(400).send("Club with this ticker at this school already exists");
+    res.send({
+      result: "TAKEN",
+    });
     return;
   } else {
-    const club = await Club.create({
-      name: `${name || ""}`,
-      ticker: `${ticker || ""}`,
-      owner: uid,
-      school: schoolName,
-      metadata: "{}",
-    });
-
     res.send({
       result: "success",
-      club: club,
     });
   }
 }

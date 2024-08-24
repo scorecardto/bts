@@ -11,18 +11,32 @@ import removeFriend from "./controllers/friends/remove";
 import updateSchoolStatus from "./controllers/school/status";
 import uploadImage from "./controllers/images/upload";
 import getImage from "./controllers/images/get";
+import checkTicker from "./controllers/clubs/checkTicker";
+import createClub from "./controllers/clubs/create";
 import registerToken from "./controllers/register_token";
+import listClubs from "./controllers/clubs/list";
+import joinClub from "./controllers/clubs/join";
+import getClub from "./controllers/clubs/get";
+import updateClub from "./controllers/clubs/update";
 
 dotenv.config();
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
 
-app.use(formidableMiddleware({
-  maxFileSize: 5 * 1024 * 1024,
-}));
+app.use(
+  formidableMiddleware({
+    maxFileSize: 5 * 1024 * 1024,
+  })
+);
 
 app.post("/v1/school/status", updateSchoolStatus);
+app.post("/v1/clubs/checkTicker", checkTicker);
+app.post("/v1/clubs/create", createClub);
+app.post("/v1/clubs/join", joinClub);
+app.get("/v1/clubs/list", listClubs);
+app.get("/v1/clubs/get", getClub);
+app.post("/v1/clubs/update", updateClub);
 
 app.post("/v1/friends/add", addFriend);
 app.post("/v1/friends/list", listFriends);

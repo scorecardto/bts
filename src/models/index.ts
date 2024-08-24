@@ -5,7 +5,11 @@ import { initializeUserClassModel } from "./UserClass";
 import { initializeSchoolModel } from "./School";
 import { initializeFriendRequestModel } from "./FriendRequest";
 import { initializeFriendshipModel } from "./Friendship";
-import { initializeClubModel } from "./Club";
+import { Club, initializeClubModel } from "./Club";
+import {
+  ClubMembership,
+  initializeClubMembershipModel,
+} from "./ClubMembership";
 
 export default function initializeModel() {
   const {
@@ -32,7 +36,11 @@ export default function initializeModel() {
   initializeUserClassModel(sequelize);
   initializeFriendRequestModel(sequelize);
   initializeFriendshipModel(sequelize);
+
   initializeClubModel(sequelize);
+  initializeClubMembershipModel(sequelize);
+  ClubMembership.belongsTo(Club);
+  Club.hasMany(ClubMembership);
 
   return sequelize;
 }

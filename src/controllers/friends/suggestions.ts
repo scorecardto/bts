@@ -22,6 +22,11 @@ export default async function suggestFriends(req: Request, res: Response) {
   const uid = user.uid;
   const schoolName = await getUserSchool(uid);
 
+  if (!schoolName) {
+    res.status(400).send("User not enrolled in Scorecard Social Services");
+    return;
+  }
+
   const uidDirectory = await getUIDDirectory(schoolName);
   const allContacts = await getContacts();
 
