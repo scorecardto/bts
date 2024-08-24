@@ -16,6 +16,8 @@ import createClub from "./controllers/clubs/create";
 import registerToken from "./controllers/register_token";
 import listClubs from "./controllers/clubs/list";
 import joinClub from "./controllers/clubs/join";
+import getClub from "./controllers/clubs/get";
+import updateClub from "./controllers/clubs/update";
 
 dotenv.config();
 
@@ -33,6 +35,8 @@ app.post("/v1/clubs/checkTicker", checkTicker);
 app.post("/v1/clubs/create", createClub);
 app.post("/v1/clubs/join", joinClub);
 app.get("/v1/clubs/list", listClubs);
+app.get("/v1/clubs/get", getClub);
+app.post("/v1/clubs/update", updateClub);
 
 app.post("/v1/friends/add", addFriend);
 app.post("/v1/friends/list", listFriends);
