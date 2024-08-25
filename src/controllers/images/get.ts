@@ -6,7 +6,7 @@ export default async function getImage(req: Request, res: Response) {
   const id = req.params.id;
   const file = getFirebase().storage().bucket().file(`images/${id}`);
 
-  if (!(await file.exists())) {
+  if (!(await file.exists())[0]) {
     res.status(404).send("Image not found");
     return;
   } else {
