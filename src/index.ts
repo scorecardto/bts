@@ -18,6 +18,7 @@ import listClubs from "./controllers/clubs/list";
 import joinClub from "./controllers/clubs/join";
 import getClub from "./controllers/clubs/get";
 import updateClub from "./controllers/clubs/update";
+import imageExists from "./controllers/images/exists";
 
 dotenv.config();
 
@@ -46,6 +47,7 @@ app.post("/v1/friends/block", removeFriend);
 
 app.post("/v1/images/upload", uploadImage);
 app.get("/v1/images/get/:id", getImage);
+app.get("/v1/images/exists/:id", imageExists);
 
 app.post("/v1/register_token", registerToken);
 
