@@ -71,6 +71,7 @@ export default async function listClubs(req: Request, res: Response) {
       isOwner: cm.owner === uid,
       // @ts-ignore
       memberCount: cm.dataValues.memberCount,
+      picture: JSON.parse(cm.metadata).picture,
       posts: [],
     });
   });
