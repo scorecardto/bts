@@ -1,8 +1,8 @@
 import exp from "constants";
 import { Sequelize } from "sequelize";
-import { initializeUserSchoolModel } from "./UserSchool";
+import { initializeUserSchoolModel, UserSchool } from "./UserSchool";
 import { initializeUserClassModel } from "./UserClass";
-import { initializeSchoolModel } from "./School";
+import { initializeSchoolModel, School } from "./School";
 import { initializeFriendRequestModel } from "./FriendRequest";
 import { initializeFriendshipModel } from "./Friendship";
 import { Club, initializeClubModel } from "./Club";
@@ -10,6 +10,7 @@ import {
   ClubMembership,
   initializeClubMembershipModel,
 } from "./ClubMembership";
+import { ClubPost, initializeClubPostModel } from "./ClubPost";
 
 export default function initializeModel() {
   const {
@@ -41,6 +42,16 @@ export default function initializeModel() {
   initializeClubMembershipModel(sequelize);
   ClubMembership.belongsTo(Club);
   Club.hasMany(ClubMembership);
+
+  initializeClubPostModel(sequelize);
+  ClubPost.belongsTo(Club);
+  Club.hasMany(ClubPost);
+
+  Club.belongsTo(UserSchool, { foreignKey: "owner", targetKey: "uid" });
+  UserSchool.hasMany(Club, { foreignKey: "owner", sourceKey: "uid" });
+
+  Club.belongsTo(School, { foreignKey: "school", targetKey: "unique_name" });
+  School.hasMany(Club, { foreignKey: "school", sourceKey: "unique_name" });
 
   return sequelize;
 }
