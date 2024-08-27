@@ -35,14 +35,14 @@ export default async function searchClubs(req: Request, res: Response) {
     // @ts-ignore
     const { first_name, last_name } = cm.dataValues.UserSchool;
     // @ts-ignore
-    // const { display_name, short_code } = cm.dataValues.School;
+    const { display_name, short_code } = cm.dataValues.School;
 
     return {
       clubName: cm.name,
       clubCode: cm.ticker,
       ownerName: `${first_name} ${last_name.substring(0, 1)}`,
-      // schoolCode: short_code,
-      // schoolName: display_name,
+      schoolCode: short_code,
+      schoolName: display_name,
       clubPicture: JSON.parse(cm.metadata).picture ?? "",
     };
   });
