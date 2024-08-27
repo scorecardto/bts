@@ -10,6 +10,7 @@ import {
   englishDataset,
   englishRecommendedTransformers,
 } from "obscenity";
+import { ClubMembership } from "../../models/ClubMembership";
 
 export default async function createClub(req: Request, res: Response) {
   const user = await requireAuth(req, res);
@@ -56,6 +57,11 @@ export default async function createClub(req: Request, res: Response) {
       owner: uid,
       school: schoolName,
       metadata: "{}",
+    });
+
+    const clubMembership = await ClubMembership.create({
+      club: club.id,
+      phone_number: user.phone_number!,
     });
 
     res.send({

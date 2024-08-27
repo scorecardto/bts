@@ -16,6 +16,9 @@ class School extends Model<
   declare verified: boolean;
   declare min_grade?: number;
   declare max_grade?: number;
+  declare display_name?: string;
+  declare short_code?: string;
+  declare special_domain?: string;
 }
 
 function initializeSchoolModel(sequelize: Sequelize) {
@@ -43,6 +46,15 @@ function initializeSchoolModel(sequelize: Sequelize) {
       },
       max_grade: {
         type: DataTypes.INTEGER,
+      },
+      display_name: {
+        type: DataTypes.STRING,
+      },
+      short_code: {
+        type: DataTypes.STRING,
+      },
+      special_domain: {
+        type: DataTypes.STRING,
       },
     },
     { sequelize, tableName: "schools", modelName: "School" }
