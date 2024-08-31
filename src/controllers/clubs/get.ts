@@ -10,21 +10,14 @@ export default async function getClub(req: Request, res: Response) {
   const user = await requireAuth(req, res);
   if (!user) return;
 
-  const clubCode = `${req.query.clubCode}`;
+  const internal_code = `${req.query.internalCode}`;
 
   const uid = user.uid;
-  const schoolName = await getUserSchool(uid);
-
-  if (schoolName == null) {
-    res.status(400).send("User not enrolled in Scorecard Social Services");
-    return;
-  }
 
   const club = await ClubModel.findOne({
     where: [
       {
-        school: schoolName,
-        ticker: clubCode,
+        internal_code: internal_code,
       },
     ],
     include: [
@@ -72,7 +65,8 @@ export default async function getClub(req: Request, res: Response) {
   const clubMetadata = JSON.parse(club.metadata);
 
   const returnItem: Club = {
-    code: clubCode,
+    clubCode: club.club_code,
+    internalCode: club.internal_code,
     // @ts-ignore
     isMember: club.dataValues.isMember,
     isOwner: club.owner === uid,

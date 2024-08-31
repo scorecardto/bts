@@ -10,7 +10,7 @@ import {
   englishRecommendedTransformers,
 } from "obscenity";
 
-export default async function checkTicker(req: Request, res: Response) {
+export default async function checkClubCode(req: Request, res: Response) {
   const user = await requireAuth(req, res);
   if (!user) return;
 
@@ -18,16 +18,16 @@ export default async function checkTicker(req: Request, res: Response) {
     ...englishDataset.build(),
     ...englishRecommendedTransformers,
   });
-  const ticker = `${req.fields?.ticker}`;
+  const code = `${req.fields?.clubCode}`;
 
-  if (ticker.length > 10) {
+  if (code.length > 10) {
     res.send({
       result: "TOO LONG",
     });
     return;
   }
 
-  if (ticker.length < 2) {
+  if (code.length < 2) {
     res.send({
       result: "TOO SHORT",
     });
@@ -36,7 +36,7 @@ export default async function checkTicker(req: Request, res: Response) {
 
   const pattern = /^[A-Z0-9]{2,10}$/;
 
-  if (!pattern.test(ticker)) {
+  if (!pattern.test(code)) {
     res.send({
       result: "INCORRECT FORMAT",
     });
@@ -55,12 +55,12 @@ export default async function checkTicker(req: Request, res: Response) {
     where: [
       {
         school: schoolName,
-        ticker: ticker,
+        club_code: code,
       },
     ],
   });
 
-  if (existing || matcher.hasMatch(ticker)) {
+  if (existing || matcher.hasMatch(code)) {
     res.send({
       result: "TAKEN",
     });

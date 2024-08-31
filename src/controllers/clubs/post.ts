@@ -16,35 +16,31 @@ export default async function createClubPost(req: Request, res: Response) {
   const user = await requireAuth(req, res);
   if (!user) return;
 
-  const clubId = req.fields?.clubId;
+  const internal_code = req.fields?.internalCode;
   const content = req.fields?.content;
   const link = req.fields?.link;
   const picture = req.fields?.picture;
   const eventDate = new Date(`${req.fields?.picture}`);
 
-  const uid = user.uid;
-  const schoolName = await getUserSchool(uid);
-
-  if (!schoolName) {
-    res.status(400).send("User not enrolled in Scorecard Social Services");
-    return;
-  }
-
   const existing = await Club.findOne({
     where: [
       {
-        school: schoolName,
-        ticker: clubId,
+        internal_code,
       },
     ],
   });
 
   if (!existing) {
-    res.status(400).send("Club with this ticker does not exist at user school");
+    res.status(400).send("Club with this identifier does not exist");
     return;
   }
 
-  if (clubId) {
+  if (existing.owner !== user.uid) {
+    res.status(401).send("User cannot modify this club");
+    return;
+  }
+
+  if (internal_code) {
     await ClubPost.create({
       club: existing.id,
       content: `${content}`,

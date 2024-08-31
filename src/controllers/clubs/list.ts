@@ -65,7 +65,8 @@ export default async function listClubs(req: Request, res: Response) {
   ).forEach((cm) => {
     clubs.push({
       name: cm.name,
-      code: cm.ticker,
+      clubCode: cm.club_code,
+      internalCode: cm.internal_code,
       // @ts-ignore
       isMember: cm.dataValues.isMember,
       isOwner: cm.owner === uid,

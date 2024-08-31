@@ -8,7 +8,7 @@ export default async function joinClub(req: Request, res: Response) {
   const user = await requireAuth(req, res);
   if (!user) return;
 
-  const ticker = req.fields?.ticker;
+  const internal_code = req.fields?.internalCode;
 
   const uid = user.uid;
   const schoolName = await getUserSchool(uid);
@@ -22,13 +22,13 @@ export default async function joinClub(req: Request, res: Response) {
     where: [
       {
         school: schoolName,
-        ticker: ticker,
+        internal_code: internal_code,
       },
     ],
   });
 
   if (!existing) {
-    res.status(400).send("Club with this ticker does not exist at user school");
+    res.status(400).send("Club with this identifier does not exist");
     return;
   }
 
