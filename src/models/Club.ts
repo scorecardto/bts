@@ -62,6 +62,7 @@ function initializeClubModel(sequelize: Sequelize) {
         type: DataTypes.STRING,
         unique: true,
         allowNull: false,
+        defaultValue: "",
       },
       metadata: {
         type: DataTypes.STRING,
@@ -72,6 +73,7 @@ function initializeClubModel(sequelize: Sequelize) {
   );
 
   Club.beforeCreate(async (instance) => {
+    console.log(instance);
     let code;
     let isUnique = false;
     while (!isUnique) {
@@ -81,6 +83,9 @@ function initializeClubModel(sequelize: Sequelize) {
         isUnique = true;
       }
     }
+
+    console.log(code);
+
     instance.internal_code = code!;
   });
 }

@@ -40,7 +40,7 @@ export default async function searchClubs(req: Request, res: Response) {
     return {
       clubName: cm.name,
       clubCode: cm.club_code,
-      interalCode: cm.internal_code,
+      internalCode: cm.internal_code,
       ownerName: `${first_name} ${last_name.substring(0, 1)}`,
       schoolCode: schoolValues?.short_code ?? undefined,
       schoolName: schoolValues?.display_name ?? undefined,
