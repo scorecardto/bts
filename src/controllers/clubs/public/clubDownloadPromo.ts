@@ -17,7 +17,7 @@ export default async function getClubDownloadPromo(
   let picture = undefined;
 
   try {
-    picture = JSON.parse(club.metadata).clubPicture;
+    picture = JSON.parse(club.metadata).picture;
   } catch (e) {}
 
   return res.send({
