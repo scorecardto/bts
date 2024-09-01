@@ -11,7 +11,7 @@ import removeFriend from "./controllers/friends/remove";
 import updateSchoolStatus from "./controllers/school/status";
 import uploadImage from "./controllers/images/upload";
 import getImage from "./controllers/images/get";
-import checkTicker from "./controllers/clubs/checkTicker";
+import checkTicker from "./controllers/clubs/checkClubCode";
 import createClub from "./controllers/clubs/create";
 import registerToken from "./controllers/register_token";
 import listClubs from "./controllers/clubs/list";
@@ -20,6 +20,8 @@ import getClub from "./controllers/clubs/get";
 import updateClub from "./controllers/clubs/update";
 import imageExists from "./controllers/images/exists";
 import searchClubs from "./controllers/clubs/search";
+import getClubDownloadPromo from "./controllers/clubs/public/clubDownloadPromo";
+import joinClubPublic from "./controllers/clubs/public/join";
 
 dotenv.config();
 
@@ -33,13 +35,15 @@ app.use(
 );
 
 app.post("/v1/school/status", updateSchoolStatus);
-app.post("/v1/clubs/checkTicker", checkTicker);
+app.post("/v1/clubs/checkClubCode", checkTicker);
 app.post("/v1/clubs/create", createClub);
 app.post("/v1/clubs/join", joinClub);
 app.get("/v1/clubs/list", listClubs);
 app.get("/v1/clubs/get", getClub);
 app.get("/v1/clubs/search", searchClubs);
 app.post("/v1/clubs/update", updateClub);
+app.get("/v1/clubs/public/clubDownloadPromo", getClubDownloadPromo);
+app.post("/v1/clubs/public/join", joinClubPublic);
 
 app.post("/v1/friends/add", addFriend);
 app.post("/v1/friends/list", listFriends);

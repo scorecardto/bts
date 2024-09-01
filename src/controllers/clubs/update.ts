@@ -13,29 +13,22 @@ export default async function updateClub(req: Request, res: Response) {
   const club: Club = req.fields?.club;
 
   const uid = user.uid;
-  const schoolName = await getUserSchool(uid);
-
-  if (!schoolName) {
-    res.status(400).send("User not enrolled in Scorecard Social Services");
-    return;
-  }
 
   const existing = await ClubModel.findOne({
     where: [
       {
-        school: schoolName,
-        ticker: club.code,
+        internal_code: club.internalCode,
       },
     ],
   });
 
   if (!existing) {
-    res.status(400).send("Club with this ticker does not exist at user school");
+    res.status(400).send("Club with this identifier does not exist");
     return;
   }
 
   if (existing.owner !== uid) {
-    res.status(400).send("User does not have permission to edit club");
+    res.status(401).send("User does not have permission to edit club");
     return;
   }
 

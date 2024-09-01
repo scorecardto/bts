@@ -22,11 +22,11 @@ export default async function createClub(req: Request, res: Response) {
     ...englishDataset.build(),
     ...englishRecommendedTransformers,
   });
-  const ticker = `${req.fields?.ticker}`;
+  const club_code = `${req.fields?.clubCode}`;
   const pattern = /^[A-Z0-9]{2,10}$/;
 
-  if (!pattern.test(ticker)) {
-    res.status(400).send("Inproper ticker format");
+  if (!pattern.test(club_code)) {
+    res.status(400).send("Inproper club code format");
     return;
   }
 
@@ -42,18 +42,18 @@ export default async function createClub(req: Request, res: Response) {
     where: [
       {
         school: schoolName,
-        ticker: ticker,
+        club_code,
       },
     ],
   });
 
-  if (existing || matcher.hasMatch(ticker)) {
+  if (existing || matcher.hasMatch(club_code)) {
     res.status(400).send("Club with this ticker at this school already exists");
     return;
   } else {
     const club = await Club.create({
       name: `${name || ""}`,
-      ticker: `${ticker || ""}`,
+      club_code: `${club_code || ""}`,
       owner: uid,
       school: schoolName,
       metadata: "{}",
