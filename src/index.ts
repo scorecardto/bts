@@ -22,6 +22,7 @@ import imageExists from "./controllers/images/exists";
 import searchClubs from "./controllers/clubs/search";
 import getClubDownloadPromo from "./controllers/clubs/public/clubDownloadPromo";
 import joinClubPublic from "./controllers/clubs/public/join";
+import getClubImage from "./controllers/images/club";
 
 dotenv.config();
 
@@ -54,6 +55,7 @@ app.post("/v1/friends/block", removeFriend);
 app.post("/v1/images/upload", uploadImage);
 app.get("/v1/images/get/:id", getImage);
 app.get("/v1/images/exists/:id", imageExists);
+app.get("/v1/images/club/:internalCode", getClubImage);
 
 app.post("/v1/register_token", registerToken);
 

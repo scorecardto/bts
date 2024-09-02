@@ -15,13 +15,19 @@ export default async function getClubDownloadPromo(
   }
 
   let picture = undefined;
+  let emoji = undefined;
+  let heroColor = undefined;
 
   try {
     picture = JSON.parse(club.metadata).picture;
+    emoji = JSON.parse(club.metadata).emoji;
+    heroColor = JSON.parse(club.metadata).heroColor;
   } catch (e) {}
 
   return res.send({
     result: "success",
     clubPicture: picture,
+    emoji,
+    heroColor,
   });
 }
