@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@jimp/plugin-print": "^1.1.0",
     "@types/react": "^18.3.3",
     "aws-param-env": "^2.1.0",
     "dotenv": "^16.4.5",
@@ -20,12 +21,15 @@
     "firebase-admin": "^12.0.0",
     "formidable": "^3.5.1",
     "gender-detection-ts": "^1.1.0",
+    "jimp": "^1.1.0",
     "mysql2": "^3.9.3",
+    "node_modules-path": "^2.0.8",
     "nodemon": "^3.1.4",
     "obscenity": "^0.4.0",
     "phone": "^3.1.42",
     "scorecard-types": "github:scorecardto/types",
     "sequelize": "^6.37.2",
+    "sharp": "^0.33.5",
     "ts-node": "^10.9.2"
   },
   "devDependencies": {

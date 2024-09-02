@@ -73,6 +73,10 @@ export default async function listClubs(req: Request, res: Response) {
       // @ts-ignore
       memberCount: cm.dataValues.memberCount,
       picture: JSON.parse(cm.metadata).picture,
+      bio: JSON.parse(cm.metadata).bio,
+      heroColor: JSON.parse(cm.metadata).heroColor,
+      link: JSON.parse(cm.metadata).link,
+      emoji: JSON.parse(cm.metadata).emoji,
       posts: [],
     });
   });
