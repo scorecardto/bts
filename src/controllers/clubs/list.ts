@@ -82,6 +82,12 @@ export default async function listClubs(req: Request, res: Response) {
     };
   });
 
+  const memberClubs = Object.entries(clubs)
+    .map((e) => {
+      return e[1].isMember ? e[0] : null;
+    })
+    .filter((b) => b != null);
+
   const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
   const inThreeDays = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
 
@@ -92,7 +98,7 @@ export default async function listClubs(req: Request, res: Response) {
     ],
     where: {
       club: {
-        [Op.in]: Object.keys(clubs),
+        [Op.in]: memberClubs,
       },
       [Op.or]: [
         {
