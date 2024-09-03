@@ -2,9 +2,10 @@ import { Request, Response } from "express";
 import requireAuth from "../../auth/requireAuth";
 import { Club as ClubModel } from "../../models/Club";
 import getUserSchool from "../../private/school/getUserSchool";
-import { Club } from "scorecard-types";
+import { Club, ClubBase, ClubPost } from "scorecard-types";
 import { ClubMembership } from "../../models/ClubMembership";
 import { Sequelize } from "sequelize";
+import { ClubPost as ClubPostModel } from "../../models/ClubPost";
 
 export default async function getClub(req: Request, res: Response) {
   const user = await requireAuth(req, res);
@@ -62,23 +63,47 @@ export default async function getClub(req: Request, res: Response) {
     return;
   }
 
+  const posts = await ClubPostModel.findAll({
+    where: {
+      club: club.id,
+    },
+    order: [["createdAt", "DESC"]],
+  });
+
+  // @ts-ignores
+  console.log(club.dataValues.posts);
+
   const clubMetadata = JSON.parse(club.metadata);
 
-  const returnItem: Club = {
+  const base: ClubBase = {
     clubCode: club.club_code,
+    name: club.name,
+    picture: clubMetadata?.picture || "",
+    emoji: clubMetadata?.emoji || "",
+    heroColor: clubMetadata?.heroColor || "",
     internalCode: club.internal_code,
+  };
+
+  const returnItem: Club = {
+    ...base,
     // @ts-ignore
     isMember: club.dataValues.isMember,
     isOwner: club.owner === uid,
     // @ts-ignore
     memberCount: club.dataValues.memberCount,
-    posts: [],
-    name: club.name,
+    posts: posts.map((p): ClubPost => {
+      return {
+        club: base,
+        content: p.content,
+        // @ts-ignore
+        postDate: p.dataValues.createdAt.getTime(),
+        link: p.link,
+        picture: p.picture,
+        eventDate: p.event_date?.getTime() ?? undefined,
+      };
+    }),
     bio: clubMetadata?.bio || "",
-    heroColor: clubMetadata?.heroColor || "",
     link: clubMetadata?.link || "",
-    picture: clubMetadata?.picture || "",
-    emoji: clubMetadata?.emoji || "",
   };
 
   res.send({

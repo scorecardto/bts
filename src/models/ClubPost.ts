@@ -14,7 +14,8 @@ class ClubPost extends Model<
   declare id: CreationOptional<number>;
   declare club: number;
   declare content: string;
-  declare eventDate: Date;
+  declare promotion_option: string;
+  declare event_date?: Date;
   declare picture?: string;
   declare link?: string;
 }
@@ -40,7 +41,11 @@ function initializeClubPostModel(sequelize: Sequelize) {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      eventDate: {
+      promotion_option: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      event_date: {
         type: DataTypes.DATE,
         allowNull: true,
       },
@@ -53,7 +58,7 @@ function initializeClubPostModel(sequelize: Sequelize) {
         allowNull: true,
       },
     },
-    { sequelize, tableName: "clubs", modelName: "Club" }
+    { sequelize, tableName: "club_posts", modelName: "ClubPost" }
   );
 }
 
