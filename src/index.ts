@@ -23,6 +23,7 @@ import searchClubs from "./controllers/clubs/search";
 import getClubDownloadPromo from "./controllers/clubs/public/clubDownloadPromo";
 import joinClubPublic from "./controllers/clubs/public/join";
 import getClubImage from "./controllers/images/club";
+import createClubPost from "./controllers/clubs/post";
 
 dotenv.config();
 
@@ -43,6 +44,7 @@ app.get("/v1/clubs/list", listClubs);
 app.get("/v1/clubs/get", getClub);
 app.get("/v1/clubs/search", searchClubs);
 app.post("/v1/clubs/update", updateClub);
+app.post("/v1/clubs/post", createClubPost);
 app.get("/v1/clubs/public/clubDownloadPromo", getClubDownloadPromo);
 app.post("/v1/clubs/public/join", joinClubPublic);
 

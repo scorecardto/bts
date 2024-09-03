@@ -2,9 +2,10 @@ import { Request, Response } from "express";
 import requireAuth from "../../auth/requireAuth";
 import { Club as ClubModel } from "../../models/Club";
 import getUserSchool from "../../private/school/getUserSchool";
-import { Club } from "scorecard-types";
+import { Club, ClubPost } from "scorecard-types";
 import { ClubMembership } from "../../models/ClubMembership";
-import { Sequelize } from "sequelize";
+import { Op, Sequelize } from "sequelize";
+import { ClubPost as ClubPostModel } from "../../models/ClubPost";
 export default async function listClubs(req: Request, res: Response) {
   const user = await requireAuth(req, res);
   if (!user) return;
@@ -17,7 +18,7 @@ export default async function listClubs(req: Request, res: Response) {
     return;
   }
 
-  const clubs: Club[] = [];
+  const clubs: { [x: string]: Club } = {};
 
   (
     await ClubModel.findAll({
@@ -63,7 +64,7 @@ export default async function listClubs(req: Request, res: Response) {
       },
     })
   ).forEach((cm) => {
-    clubs.push({
+    clubs[cm.id] = {
       name: cm.name,
       clubCode: cm.club_code,
       internalCode: cm.internal_code,
@@ -78,11 +79,65 @@ export default async function listClubs(req: Request, res: Response) {
       link: JSON.parse(cm.metadata).link,
       emoji: JSON.parse(cm.metadata).emoji,
       posts: [],
-    });
+    };
+  });
+
+  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const inThreeDays = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+
+  const recentPostsSubquery = await ClubPostModel.findAll({
+    attributes: [
+      "club",
+      [Sequelize.fn("MAX", Sequelize.col("createdAt")), "recentPostDate"],
+    ],
+    where: {
+      club: {
+        [Op.in]: Object.keys(clubs),
+      },
+      [Op.or]: [
+        {
+          // @ts-ignore
+          createdAt: { [Op.gte]: oneDayAgo },
+        },
+        {
+          [Op.and]: [
+            {
+              event_date: { [Op.lte]: inThreeDays },
+            },
+          ],
+        },
+      ],
+    },
+    group: ["club"],
+  });
+
+  const recentPosts = await ClubPostModel.findAll({
+    where: {
+      [Op.or]: recentPostsSubquery.map((item) => {
+        return {
+          club: item.club,
+          // @ts-ignore
+          createdAt: item.dataValues.recentPostDate,
+        };
+      }),
+    },
+  });
+
+  const recentPostsFormatted: ClubPost[] = recentPosts.map((p) => {
+    return {
+      content: p.content,
+      // @ts-ignore
+      postDate: p.dataValues.createdAt?.getTime(),
+      eventDate: p.event_date?.getTime(),
+      link: p.link,
+      picture: p.picture,
+      club: clubs[p.club],
+    };
   });
 
   res.send({
     result: "success",
-    clubs,
+    clubs: Object.values(clubs),
+    recentPosts: recentPostsFormatted,
   });
 }

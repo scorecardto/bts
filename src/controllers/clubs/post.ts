@@ -11,21 +11,39 @@ import {
   englishRecommendedTransformers,
 } from "obscenity";
 import { ClubPost } from "../../models/ClubPost";
+import { ClubPostInternal } from "scorecard-types";
 
 export default async function createClubPost(req: Request, res: Response) {
+  const VALID_OPTIONS = ["BASIC", "PROMOTE"];
+
   const user = await requireAuth(req, res);
   if (!user) return;
 
-  const internal_code = req.fields?.internalCode;
-  const content = req.fields?.content;
-  const link = req.fields?.link;
-  const picture = req.fields?.picture;
-  const eventDate = new Date(`${req.fields?.picture}`);
+  // @ts-ignore
+  const post: ClubPostInternal | null = req.fields?.post;
+
+  if (!post) {
+    res.status(500).send("Post is corrupted");
+    return;
+  }
+
+  const promotionOptionRaw = post.promotionOption;
+
+  const promotionOption = VALID_OPTIONS.includes(promotionOptionRaw)
+    ? promotionOptionRaw
+    : VALID_OPTIONS[0];
+
+  const { club, content, link, picture } = post;
+
+  console.log(post);
+
+  const eventDateRaw = post.eventDate;
+  const eventDate = eventDateRaw ? new Date(eventDateRaw) : undefined;
 
   const existing = await Club.findOne({
     where: [
       {
-        internal_code,
+        internal_code: club.internalCode,
       },
     ],
   });
@@ -40,11 +58,12 @@ export default async function createClubPost(req: Request, res: Response) {
     return;
   }
 
-  if (internal_code) {
+  if (club.internalCode) {
     await ClubPost.create({
       club: existing.id,
       content: `${content}`,
-      eventDate,
+      event_date: eventDate,
+      promotion_option: promotionOption,
       link: link ? `${link}` : undefined,
       picture: picture ? `${picture}` : undefined,
     });
