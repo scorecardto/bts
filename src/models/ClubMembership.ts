@@ -16,6 +16,8 @@ class ClubMembership extends Model<
   declare phone_number: string;
   declare email: CreationOptional<string>;
   declare club: number;
+  declare first_name: CreationOptional<string>;
+  declare last_name: CreationOptional<string>;
 }
 
 function initializeClubMembershipModel(sequelize: Sequelize) {
@@ -41,6 +43,12 @@ function initializeClubMembershipModel(sequelize: Sequelize) {
           key: "id",
         },
         allowNull: false,
+      },
+      first_name: {
+        type: DataTypes.STRING,
+      },
+      last_name: {
+        type: DataTypes.STRING,
       },
     },
     { sequelize, tableName: "club_memberships", modelName: "ClubMembership" }
