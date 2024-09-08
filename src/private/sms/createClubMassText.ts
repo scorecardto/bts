@@ -90,7 +90,7 @@ export default async function createClubMassText(
 
   const contacts = await getContacts(clubId);
 
-  const toText = await sendPushNotifications(post.club.clubCode,
+  const toText = await sendPushNotifications(post.club.internalCode,
       `${emoji} Post in ${post.club.name}`,
       smartTruncate(post.content, 144)+"...", contacts.map(c => c.fbToken));
 
