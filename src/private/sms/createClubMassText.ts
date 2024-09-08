@@ -6,6 +6,7 @@ import { ClubMembership } from "../../models/ClubMembership";
 import sendMessage from "./sendTextMessage";
 import { TextTransaction } from "../../models/TextTransaction";
 import { Op, Sequelize } from "sequelize";
+import sendPushNotifications from "../push/sendPushNotifications";
 
 const IGNORE_IS_USER = true;
 const MAX_FREE_TEXTS = 3;
@@ -23,32 +24,23 @@ type Contact = {
   firstName?: string;
   lastName?: string;
   numberTextsSent: number;
+  fbToken?: string;
 };
 
-async function getTextEligible(clubId: number): Promise<Contact[]> {
+async function getContacts(clubId: number): Promise<Contact[]> {
   const users = await getUsers();
 
   const memberships = await ClubMembership.findAll({
     where: { club: clubId },
   });
 
-  const phoneNumbersToSend: Contact[] = [];
-
-  for (let member of memberships) {
-    if (
-      !users.find((u) => u.phoneNumber === member.phone_number) ||
-      IGNORE_IS_USER
-    ) {
-      phoneNumbersToSend.push({
-        phoneNumber: member.phone_number,
-        firstName: member.first_name,
-        lastName: member.last_name,
-        numberTextsSent: -1,
-      });
-    }
-  }
-
-  return phoneNumbersToSend;
+  return memberships.map(member => {return {
+    phoneNumber: member.phone_number,
+    firstName: member.first_name,
+    lastName: member.last_name,
+    numberTextsSent: -1,
+    fbToken: users.find((u) => u.phoneNumber === member.phone_number)?.uid,
+  }});
 }
 
 async function aggregateTextCount(contacts: Contact[]): Promise<Contact[]> {
@@ -96,11 +88,17 @@ export default async function createClubMassText(
   // ROUGH EST. you get at least 167 characters
   const leadMessage = `${emoji} From ${hashtag}: ${post.content}`;
 
-  const contacts = await aggregateTextCount(await getTextEligible(clubId));
+  const contacts = await getContacts(clubId);
+
+  const toText = await sendPushNotifications(post.club.internalCode,
+      `${emoji} Post in ${post.club.name}`,
+      smartTruncate(post.content, 144)+"...", contacts.map(c => c.fbToken));
+
+  const finalContacts = await aggregateTextCount(contacts.filter((_, i) => toText.includes(i)));
 
   const transactionReceipts: any[] = [];
 
-  for (let c of contacts) {
+  for (let c of finalContacts) {
     let message = "";
 
     if (c.numberTextsSent === MAX_FREE_TEXTS) {
