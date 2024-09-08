@@ -11,6 +11,7 @@ import {
   initializeClubMembershipModel,
 } from "./ClubMembership";
 import { ClubPost, initializeClubPostModel } from "./ClubPost";
+import { initializeTextTransactionModel } from "./TextTransaction";
 
 export default function initializeModel() {
   const {
@@ -52,6 +53,8 @@ export default function initializeModel() {
 
   Club.belongsTo(School, { foreignKey: "school", targetKey: "unique_name" });
   School.hasMany(Club, { foreignKey: "school", sourceKey: "unique_name" });
+
+  initializeTextTransactionModel(sequelize);
 
   return sequelize;
 }

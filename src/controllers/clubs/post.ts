@@ -1,17 +1,9 @@
 import { Request, Response } from "express";
 import requireAuth from "../../auth/requireAuth";
 import { Club } from "../../models/Club";
-import getUserSchool from "../../private/school/getUserSchool";
-import { School } from "../../models/School";
-
-import {
-  RegExpMatcher,
-  TextCensor,
-  englishDataset,
-  englishRecommendedTransformers,
-} from "obscenity";
 import { ClubPost } from "../../models/ClubPost";
 import { ClubPostInternal } from "scorecard-types";
+import createClubMassText from "../../private/sms/createClubMassText";
 
 export default async function createClubPost(req: Request, res: Response) {
   const VALID_OPTIONS = ["BASIC", "PROMOTE"];
@@ -67,6 +59,10 @@ export default async function createClubPost(req: Request, res: Response) {
       link: link ? `${link}` : undefined,
       picture: picture ? `${picture}` : undefined,
     });
+  }
+
+  if (promotionOption === "PROMOTE") {
+    await createClubMassText(post, existing.id);
   }
 
   res.send({

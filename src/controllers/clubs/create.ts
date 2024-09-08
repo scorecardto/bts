@@ -11,11 +11,13 @@ import {
   englishRecommendedTransformers,
 } from "obscenity";
 import { ClubMembership } from "../../models/ClubMembership";
+import { UserSchool } from "../../models/UserSchool";
 
 export default async function createClub(req: Request, res: Response) {
   const user = await requireAuth(req, res);
   if (!user) return;
 
+  const email = req.fields?.email;
   const name = req.fields?.name;
 
   const matcher = new RegExpMatcher({
@@ -31,7 +33,14 @@ export default async function createClub(req: Request, res: Response) {
   }
 
   const uid = user.uid;
-  const schoolName = await getUserSchool(uid);
+
+  const userSchool = await UserSchool.findOne({
+    where: {
+      uid: uid,
+    },
+  });
+
+  const schoolName = userSchool?.school || null;
 
   if (!schoolName) {
     res.status(400).send("User not enrolled in Scorecard Social Services");
@@ -62,6 +71,9 @@ export default async function createClub(req: Request, res: Response) {
     const clubMembership = await ClubMembership.create({
       club: club.id,
       phone_number: user.phone_number!,
+      first_name: userSchool?.first_name || undefined,
+      last_name: userSchool?.last_name || undefined,
+      email: email ? `${email}` : undefined,
     });
 
     res.send({

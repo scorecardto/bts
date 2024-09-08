@@ -17,6 +17,12 @@ export default async function joinClubPublic(req: Request, res: Response) {
   const internalCode = `${internalCodeRaw}`;
   const phone_number_raw = req.fields?.phone_number;
   const email_raw = `${req.fields?.email}`;
+  const first_name = req.fields?.first_name
+    ? `${req.fields?.first_name}`
+    : undefined;
+  const last_name = req.fields?.last_name
+    ? `${req.fields?.last_name}`
+    : undefined;
 
   if (!phone_number_raw) {
     return res.status(400).send("NO_PHONE_NUMBER");
@@ -62,6 +68,8 @@ export default async function joinClubPublic(req: Request, res: Response) {
     club: club.id,
     phone_number,
     email,
+    first_name,
+    last_name,
   });
 
   return res.status(200).send({
