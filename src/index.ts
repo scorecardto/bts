@@ -24,6 +24,7 @@ import getClubDownloadPromo from "./controllers/clubs/public/clubDownloadPromo";
 import joinClubPublic from "./controllers/clubs/public/join";
 import getClubImage from "./controllers/images/club";
 import createClubPost from "./controllers/clubs/post";
+import leaveClub from "./controllers/clubs/leave";
 
 dotenv.config();
 
@@ -36,8 +37,19 @@ app.use(
   })
 );
 
+// @ts-ignore
+app.use((err, req, res, next) => {
+  if (err && err.message.includes("maxFileSize exceeded")) {
+    return res
+      .status(413)
+      .json({ error: "File size too large. Max size is 5MB." });
+  }
+
+  return res.status(500).json({ error: "Something went wrong!" });
+});
+
 app.post("/v1/school/status", updateSchoolStatus);
-app.post("/v1/clubs/checkClubCode", checkTicker);
+app.post("/v1/clubs/checkClu  bCode", checkTicker);
 app.post("/v1/clubs/create", createClub);
 app.post("/v1/clubs/join", joinClub);
 app.get("/v1/clubs/list", listClubs);
@@ -47,6 +59,7 @@ app.post("/v1/clubs/update", updateClub);
 app.post("/v1/clubs/post", createClubPost);
 app.get("/v1/clubs/public/clubDownloadPromo", getClubDownloadPromo);
 app.post("/v1/clubs/public/join", joinClubPublic);
+app.post("/v1/clubs/leave", leaveClub);
 
 app.post("/v1/friends/add", addFriend);
 app.post("/v1/friends/list", listFriends);
