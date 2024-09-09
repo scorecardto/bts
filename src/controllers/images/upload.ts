@@ -17,41 +17,48 @@ const magicBytes: { [type: string]: number[] } = {
 };
 
 export default async function uploadImage(req: Request, res: Response) {
-  const user = await requireAuth(req, res);
-  if (!user) return;
+  try {
+    const user = await requireAuth(req, res);
+    if (!user) return;
 
-  const id = randomUUID();
-  const file = getFirebase().storage().bucket().file(`images/${id}`);
+    const id = randomUUID();
+    const file = getFirebase().storage().bucket().file(`images/${id}`);
 
-  const image = req.files?.image as unknown as File;
-  if (image == undefined) {
-    res.status(400).send("No file upload found");
+    const image = req.files?.image as unknown as File;
+    if (image == undefined) {
+      res.status(400).send("No file upload found");
+      return;
+    }
+
+    // @ts-ignore
+    const data = fs.readFileSync(image.path); // claims it's `.filepath`, but it's actually `.path`
+
+    console.log(data.byteLength);
+
+    if (data.byteLength > 5 * 1024 * 1024) {
+      // 5 MB
+      res.status(400).send("Image too large");
+      return;
+    }
+
+    const type = Object.keys(magicBytes).find(
+      (type) => data.indexOf(Uint8Array.from(magicBytes[type])) == 0
+    );
+    if (!type) {
+      res.status(400).send("Invalid image format");
+      return;
+    }
+
+    await file.save(data);
+    // @ts-ignore
+    await file.setMetadata({ contentType: mime.getType(type) });
+
+    res.send({
+      result: "success",
+      id: id,
+    });
+  } catch (e) {
+    res.status(500).send("Error uploading image");
     return;
   }
-
-  // @ts-ignore
-  const data = fs.readFileSync(image.path); // claims it's `.filepath`, but it's actually `.path`
-
-  if (data.byteLength > 5 * 1024 * 1024) {
-    // 5 MB
-    res.status(400).send("Image too large");
-    return;
-  }
-
-  const type = Object.keys(magicBytes).find(
-    (type) => data.indexOf(Uint8Array.from(magicBytes[type])) == 0
-  );
-  if (!type) {
-    res.status(400).send("Invalid image format");
-    return;
-  }
-
-  await file.save(data);
-  // @ts-ignore
-  await file.setMetadata({ contentType: mime.getType(type) });
-
-  res.send({
-    result: "success",
-    id: id,
-  });
 }

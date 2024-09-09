@@ -82,6 +82,8 @@ export default async function getClub(req: Request, res: Response) {
     emoji: clubMetadata?.emoji || "",
     heroColor: clubMetadata?.heroColor || "",
     internalCode: club.internal_code,
+    verified: club.verified ?? false,
+    official: club.official ?? false,
   };
 
   const returnItem: Club = {

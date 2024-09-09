@@ -6,32 +6,15 @@ import { ClubMembership } from "../../models/ClubMembership";
 import { Op } from "sequelize";
 import { UserSchool } from "../../models/UserSchool";
 
-export default async function joinClub(req: Request, res: Response) {
+export default async function leaveClub(req: Request, res: Response) {
   const user = await requireAuth(req, res);
   if (!user) return;
 
-  const internal_code = req.fields?.internalCode;
-  const email = req.fields?.email;
-
-  const uid = user.uid;
-
-  const userSchool = await UserSchool.findOne({
-    where: {
-      uid: uid,
-    },
-  });
-
-  const schoolName = userSchool?.school || null;
-
-  if (!schoolName) {
-    res.status(400).send("User not enrolled in Scorecard Social Services");
-    return;
-  }
+  const internal_code = req.fields?.internal_code;
 
   const existing = await Club.findOne({
     where: [
       {
-        school: schoolName,
         internal_code: internal_code,
       },
     ],
@@ -49,20 +32,13 @@ export default async function joinClub(req: Request, res: Response) {
     },
   });
 
-  console.log(existingMembership);
-
-  if (existingMembership) {
-    res.status(500).send("User is already member of this club");
+  if (!existingMembership) {
+    res.status(500).send("User is not a member of this club");
     return;
   }
 
-  const membership = await ClubMembership.create({
-    email: email ? `${email}` : undefined,
-    phone_number: user.phone_number!,
-    club: existing.id,
-    first_name: userSchool?.first_name || undefined,
-    last_name: userSchool?.last_name || undefined,
-  });
+  existingMembership.destroy();
+
   res.send({
     result: "success",
   });

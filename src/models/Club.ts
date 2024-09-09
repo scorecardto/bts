@@ -12,6 +12,8 @@ class Club extends Model<InferAttributes<Club>, InferCreationAttributes<Club>> {
   declare id: CreationOptional<number>;
   declare name: string;
   declare school: string;
+  declare official: CreationOptional<boolean>;
+  declare verified: CreationOptional<boolean>;
   declare owner: string;
   declare metadata: string;
   declare club_code: string;
@@ -37,6 +39,14 @@ function initializeClubModel(sequelize: Sequelize) {
         primaryKey: true,
         allowNull: false,
         autoIncrement: true,
+      },
+      official: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      verified: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
       },
       school: {
         type: DataTypes.STRING,

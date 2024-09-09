@@ -4,6 +4,8 @@ import { Club } from "../../models/Club";
 import { ClubPost } from "../../models/ClubPost";
 import { ClubPostInternal } from "scorecard-types";
 import createClubMassText from "../../private/sms/createClubMassText";
+import sendMailMessage from "../../private/mail/sendMailMessage";
+import createClubMassMail from "../../private/mail/createClubMassMail";
 
 export default async function createClubPost(req: Request, res: Response) {
   const VALID_OPTIONS = ["BASIC", "PROMOTE"];
@@ -62,7 +64,7 @@ export default async function createClubPost(req: Request, res: Response) {
   }
 
   if (promotionOption === "PROMOTE") {
-    await createClubMassText(post, existing.id);
+    createClubMassMail(post, existing.id);
   }
 
   res.send({

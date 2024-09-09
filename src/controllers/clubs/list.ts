@@ -67,6 +67,8 @@ export default async function listClubs(req: Request, res: Response) {
     clubs[cm.id] = {
       name: cm.name,
       clubCode: cm.club_code,
+      verified: cm.verified,
+      official: cm.official,
       internalCode: cm.internal_code,
       // @ts-ignore
       isMember: cm.dataValues.isMember,
@@ -88,6 +90,7 @@ export default async function listClubs(req: Request, res: Response) {
     })
     .filter((b) => b != null);
 
+  const rightNow = new Date();
   const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
   const inThreeDays = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
 
@@ -102,13 +105,24 @@ export default async function listClubs(req: Request, res: Response) {
       },
       [Op.or]: [
         {
-          // @ts-ignore
-          createdAt: { [Op.gte]: oneDayAgo },
+          [Op.and]: [
+            {
+              // @ts-ignore
+              createdAt: { [Op.gte]: oneDayAgo },
+            },
+            {
+              // @ts-ignore
+              createdAt: { [Op.lte]: rightNow },
+            },
+          ],
         },
         {
           [Op.and]: [
             {
               event_date: { [Op.lte]: inThreeDays },
+            },
+            {
+              event_date: { [Op.gte]: rightNow },
             },
           ],
         },

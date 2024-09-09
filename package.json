@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-ses": "^3.645.0",
     "@jimp/plugin-print": "^1.1.0",
     "@types/react": "^18.3.3",
     "aws-param-env": "^2.1.0",
@@ -29,6 +30,7 @@
     "nodemon": "^3.1.4",
     "obscenity": "^0.4.0",
     "phone": "^3.1.42",
+    "sanitize-html": "^2.13.0",
     "scorecard-types": "github:scorecardto/types",
     "sequelize": "^6.37.2",
     "sharp": "^0.33.5",
@@ -40,6 +42,7 @@
     "@types/express": "^4.17.21",
     "@types/express-formidable": "^1.2.3",
     "@types/node": "^20.11.25",
+    "@types/sanitize-html": "^2.13.0",
     "@types/smart-truncate": "^1.0.5",
     "typescript": "^5.4.2"
   },
