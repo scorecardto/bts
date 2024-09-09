@@ -13,7 +13,9 @@ export default async function sendMailMessage(
   to: string[],
   post: ClubPost
 ): Promise<any> {
-  let template = "club_post_notification";
+  let template = post.club.picture
+    ? "club_post_notification_with_pfp"
+    : "club_post_notification";
 
   const templateData: any = {
     content: clean(post.content),
@@ -23,9 +25,11 @@ export default async function sendMailMessage(
     club_picture: post.club.picture,
   };
 
-  if (post.club.picture) {
-    templateData["picture"] = post.club.picture;
-    template = "club_post_notification_with_image";
+  if (post.picture) {
+    templateData["picture"] = post.picture;
+    template = post.club.picture
+      ? "club_post_notification_with_image_pfp"
+      : "club_post_notification_with_image";
   }
 
   const sendTemplatedEmailCommand = new SendBulkTemplatedEmailCommand({
