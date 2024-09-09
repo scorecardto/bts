@@ -5,7 +5,7 @@ import sanitize from "sanitize-html";
 
 function clean(content: string) {
   return sanitize(content, {
-    allowedTags: false,
+    allowedTags: [],
     allowedAttributes: false,
   });
 }
@@ -32,7 +32,7 @@ export default async function sendMailMessage(
     Destinations: to.map((a) => {
       return {
         Destination: {
-          ToAddresses: [""],
+          ToAddresses: [a],
         },
       };
     }),
