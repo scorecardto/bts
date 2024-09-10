@@ -10,7 +10,6 @@ import { School } from "scorecard-types";
 export default async function updateSchoolStatus(req: Request, res: Response) {
   const {
     schoolName,
-    districtHost,
     gradeLevel,
     studentFirstName,
     studentLastName,
@@ -19,6 +18,13 @@ export default async function updateSchoolStatus(req: Request, res: Response) {
     schedule,
   } = req.fields ?? {};
 
+  let districtHost: string | undefined = req.fields?.ditrictHost as
+    | string
+    | undefined;
+
+  if (districtHost === "dino.scorecardgrades.com") {
+    districtHost = "austin.erp.frontlineeducation.com";
+  }
   console.log(req.fields);
 
   const user = await requireAuth(req, res);

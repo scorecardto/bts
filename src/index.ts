@@ -75,7 +75,7 @@ app.get("/v1/images/club/:internalCode", getClubImage);
 app.post("/v1/register_token", registerToken);
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("Express + TypeScript Server (4)");
+  res.send("Server build: (5)");
 });
 
 const db = initializeModel().sync();
