@@ -18,9 +18,7 @@ export default async function updateSchoolStatus(req: Request, res: Response) {
     schedule,
   } = req.fields ?? {};
 
-  let districtHost: string | undefined = req.fields?.ditrictHost as
-    | string
-    | undefined;
+  let districtHost = `${req.fields?.ditrictHost}`;
 
   if (districtHost === "dino.scorecardgrades.com") {
     districtHost = "austin.erp.frontlineeducation.com";
