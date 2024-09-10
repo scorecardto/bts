@@ -64,7 +64,7 @@ export default async function listClubs(req: Request, res: Response) {
       },
     })
   ).forEach((cm) => {
-    const metadata = JSON.parse(cm.metadata) ?? {};
+    const metadata = JSON.parse(cm.metadata ?? "{}") ?? {};
 
     clubs[cm.id] = {
       name: cm.name,
