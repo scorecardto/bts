@@ -49,7 +49,7 @@ app.use((err, req, res, next) => {
 });
 
 app.post("/v1/school/status", updateSchoolStatus);
-app.post("/v1/clubs/checkClu  bCode", checkTicker);
+app.post("/v1/clubs/checkClubCode", checkTicker);
 app.post("/v1/clubs/create", createClub);
 app.post("/v1/clubs/join", joinClub);
 app.get("/v1/clubs/list", listClubs);
@@ -75,7 +75,7 @@ app.get("/v1/images/club/:internalCode", getClubImage);
 app.post("/v1/register_token", registerToken);
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("Express + TypeScript Server (4)");
+  res.send("Server build: (5)");
 });
 
 const db = initializeModel().sync();

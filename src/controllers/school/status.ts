@@ -1,15 +1,15 @@
 import { Request, Response } from "express";
 import requireAuth from "../../auth/requireAuth";
-import { School } from "../../models/School";
+import { School as SchoolModel } from "../../models/School";
 import { UserSchool } from "../../models/UserSchool";
 import { UserClass } from "../../models/UserClass";
 import { Club } from "../../models/Club";
 import { ClubMembership } from "../../models/ClubMembership";
+import { School } from "scorecard-types";
 
 export default async function updateSchoolStatus(req: Request, res: Response) {
   const {
     schoolName,
-    districtHost,
     gradeLevel,
     studentFirstName,
     studentLastName,
@@ -18,12 +18,21 @@ export default async function updateSchoolStatus(req: Request, res: Response) {
     schedule,
   } = req.fields ?? {};
 
+  let districtHost = `${req.fields?.districtHost}`;
+
+  if (districtHost === "dino.scorecardgrades.com") {
+    districtHost = "austin.erp.frontlineeducation.com";
+  }
+  console.log(req.fields);
+
   const user = await requireAuth(req, res);
   if (!user) return;
 
   const uniqueSchoolName = `${districtHost}-${schoolName}`;
 
-  const school = await School.findOne({
+  let schoolIsVerified = false;
+
+  let school = await SchoolModel.findOne({
     where: [
       {
         unique_name: uniqueSchoolName,
@@ -31,13 +40,17 @@ export default async function updateSchoolStatus(req: Request, res: Response) {
     ],
   });
 
+  console.log(school);
+
   if (!school) {
-    await School.create({
+    school = await SchoolModel.create({
       unique_name: uniqueSchoolName,
       district_host: `${districtHost}`,
       name: `${schoolName}`,
       verified: false,
     });
+  } else {
+    schoolIsVerified = school.verified;
   }
 
   const existingUserSchool = await UserSchool.findOne({
@@ -140,9 +153,17 @@ export default async function updateSchoolStatus(req: Request, res: Response) {
     })
   );
 
+  const schoolReturn: School = {
+    district: school.district_host,
+    name: school.name,
+    uniqueName: school.unique_name,
+    verified: schoolIsVerified,
+    displayName: school.display_name,
+  };
   res.send({
     result: "success",
     status: {
+      school: schoolReturn,
       clubs,
     },
   });
