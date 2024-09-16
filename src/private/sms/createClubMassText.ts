@@ -94,6 +94,9 @@ export default async function createClubMassText(
       `${emoji} Post in ${post.club.name}`,
       smartTruncate(post.content, 144)+"...", contacts.map(c => c.fbToken));
 
+  // TODO: send text messages to everyone else (API currently not verified, so this is disabled)
+  return
+
   const finalContacts = await aggregateTextCount(contacts.filter((_, i) => toText.includes(i)));
 
   const transactionReceipts: any[] = [];

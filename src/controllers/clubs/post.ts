@@ -65,6 +65,7 @@ export default async function createClubPost(req: Request, res: Response) {
 
   if (promotionOption === "PROMOTE") {
     createClubMassMail(post, existing.id);
+    createClubMassText(post, existing.id);
   }
 
   res.send({
