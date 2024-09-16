@@ -55,7 +55,7 @@ export default async function createClubPost(req: Request, res: Response) {
   if (club.internalCode) {
     await ClubPost.create({
       club: existing.id,
-      content: `${content}`,
+      content: `${content}` || " ",
       event_date: eventDate,
       promotion_option: promotionOption,
       link: link ? `${link}` : undefined,
