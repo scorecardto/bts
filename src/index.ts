@@ -25,6 +25,7 @@ import joinClubPublic from "./controllers/clubs/public/join";
 import getClubImage from "./controllers/images/club";
 import createClubPost from "./controllers/clubs/post";
 import leaveClub from "./controllers/clubs/leave";
+import courseGlyphs from "./controllers/static/courseGlyphs";
 
 dotenv.config();
 
@@ -73,6 +74,8 @@ app.get("/v1/images/exists/:id", imageExists);
 app.get("/v1/images/club/:internalCode", getClubImage);
 
 app.post("/v1/register_token", registerToken);
+
+app.get("/v1/static/courseGlyphs", courseGlyphs);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Server build: (5)");
