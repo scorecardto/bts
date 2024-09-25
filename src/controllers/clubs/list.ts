@@ -64,6 +64,8 @@ export default async function listClubs(req: Request, res: Response) {
       },
     })
   ).forEach((cm) => {
+    const metadata = JSON.parse(cm.metadata ?? "{}") ?? {};
+
     clubs[cm.id] = {
       name: cm.name,
       clubCode: cm.club_code,
@@ -75,11 +77,11 @@ export default async function listClubs(req: Request, res: Response) {
       isOwner: cm.owner === uid,
       // @ts-ignore
       memberCount: cm.dataValues.memberCount,
-      picture: JSON.parse(cm.metadata).picture,
-      bio: JSON.parse(cm.metadata).bio,
-      heroColor: JSON.parse(cm.metadata).heroColor,
-      link: JSON.parse(cm.metadata).link,
-      emoji: JSON.parse(cm.metadata).emoji,
+      picture: metadata.picture,
+      bio: metadata.bio,
+      heroColor: metadata.heroColor,
+      link: metadata.link,
+      emoji: metadata.emoji,
       posts: [],
     };
   });
