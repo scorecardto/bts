@@ -8,6 +8,7 @@ import { Op, Sequelize } from "sequelize";
 import { Club } from "../../models/Club";
 import { validate } from "email-validator";
 import sendMailMessage from "./sendMailMessage";
+import { ClubEmailEnrollment } from "../../models/ClubEmailEnrollment";
 
 export default async function createClubMassMail(
   post: ClubPostInternal,
@@ -21,14 +22,37 @@ export default async function createClubMassMail(
     },
   });
 
-  const email_list = memberships
+  const enrollments = await ClubEmailEnrollment.findAll({
+    where: {
+      club: clubId,
+    },
+  });
+
+  const email_list = new Set<string>(
+    memberships
+      .filter((m) => {
+        if (m.email) {
+          return validate(m.email);
+        }
+        return false;
+      })
+      .map((m) => m.email)
+  );
+
+  enrollments
     .filter((m) => {
       if (m.email) {
         return validate(m.email);
       }
       return false;
     })
-    .map((m) => m.email);
+    .forEach((m) => email_list.add(m.email));
 
-  sendMailMessage(email_list, post);
+  if (email_list.size >= 1) {
+    const email_array = [...email_list];
+
+    console.log(email_array);
+
+    sendMailMessage(email_array, post);
+  }
 }

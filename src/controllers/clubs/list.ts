@@ -56,6 +56,10 @@ export default async function listClubs(req: Request, res: Response) {
                 SELECT COUNT(*)
                 FROM club_memberships AS ClubMembership
                 WHERE ClubMembership.club = Club.id
+              ) + (
+                SELECT COUNT(*)
+                FROM club_email_enrollments AS ClubEmailEnrollment
+                WHERE ClubEmailEnrollment.club = Club.id
               )
             `),
             "memberCount",

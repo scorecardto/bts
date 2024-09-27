@@ -12,6 +12,10 @@ import {
 } from "./ClubMembership";
 import { ClubPost, initializeClubPostModel } from "./ClubPost";
 import { initializeTextTransactionModel } from "./TextTransaction";
+import {
+  ClubEmailEnrollment,
+  initializeClubEmailEnrollmentModel,
+} from "./ClubEmailEnrollment";
 
 export default function initializeModel() {
   const {
@@ -55,6 +59,10 @@ export default function initializeModel() {
   School.hasMany(Club, { foreignKey: "school", sourceKey: "unique_name" });
 
   initializeTextTransactionModel(sequelize);
+
+  initializeClubEmailEnrollmentModel(sequelize);
+  ClubEmailEnrollment.belongsTo(Club);
+  Club.hasMany(ClubEmailEnrollment);
 
   return sequelize;
 }
