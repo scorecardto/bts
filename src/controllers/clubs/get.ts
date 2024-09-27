@@ -51,6 +51,11 @@ export default async function getClub(req: Request, res: Response) {
                 FROM club_memberships AS ClubMembership
                 WHERE ClubMembership.club = Club.id
               )
+              + (
+                SELECT COUNT(*)
+                FROM club_email_enrollments AS ClubEmailEnrollment
+                WHERE ClubEmailEnrollment.club = Club.id
+              )
             `),
           "memberCount",
         ],
