@@ -18,6 +18,7 @@ class ClubMembership extends Model<
   declare club: number;
   declare first_name: CreationOptional<string>;
   declare last_name: CreationOptional<string>;
+  declare manager: CreationOptional<boolean>;
 }
 
 function initializeClubMembershipModel(sequelize: Sequelize) {
@@ -49,6 +50,10 @@ function initializeClubMembershipModel(sequelize: Sequelize) {
       },
       last_name: {
         type: DataTypes.STRING,
+      },
+      manager: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
       },
     },
     { sequelize, tableName: "club_memberships", modelName: "ClubMembership" }

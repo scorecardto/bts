@@ -27,6 +27,8 @@ import createClubPost from "./controllers/clubs/post";
 import leaveClub from "./controllers/clubs/leave";
 import onboardClub from "./controllers/clubs/onboardClub";
 import courseGlyphs from "./controllers/static/courseGlyphs";
+import getMembers from "./controllers/clubs/members";
+import changeMember from "./controllers/clubs/changeMember";
 
 dotenv.config();
 
@@ -56,6 +58,8 @@ app.post("/v1/clubs/create", createClub);
 app.post("/v1/clubs/join", joinClub);
 app.get("/v1/clubs/list", listClubs);
 app.get("/v1/clubs/get", getClub);
+app.get("/v1/clubs/members", getMembers);
+app.post("/v1/clubs/changeMember", changeMember);
 app.get("/v1/clubs/search", searchClubs);
 app.post("/v1/clubs/update", updateClub);
 app.post("/v1/clubs/post", createClubPost);

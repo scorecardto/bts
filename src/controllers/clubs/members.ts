@@ -2,12 +2,20 @@ import { Request, Response } from "express";
 import requireAuth from "../../auth/requireAuth";
 import { Club as ClubModel } from "../../models/Club";
 import getUserSchool from "../../private/school/getUserSchool";
-import { Club, ClubBase, ClubPost } from "scorecard-types";
+import {
+  Club,
+  ClubBase,
+  ClubEnrollmentBase,
+  ClubMembershipBase,
+  ClubPost,
+} from "scorecard-types";
 import { ClubMembership } from "../../models/ClubMembership";
 import { Sequelize } from "sequelize";
 import { ClubPost as ClubPostModel } from "../../models/ClubPost";
+import { ClubEmailEnrollment } from "../../models/ClubEmailEnrollment";
+import getUserPhoneNumber from "../../auth/getUserPhoneNumber";
 
-export default async function getClub(req: Request, res: Response) {
+export default async function getMembers(req: Request, res: Response) {
   const user = await requireAuth(req, res);
   if (!user) return;
 
@@ -80,57 +88,52 @@ export default async function getClub(req: Request, res: Response) {
     return;
   }
 
-  const posts = await ClubPostModel.findAll({
+  // @ts-ignore
+  if (club.owner !== user.uid && !club.dataValues.isManager) {
+    res.status(401).send("User cannot access this");
+    return;
+  }
+
+  const ownerPhoneNumber = await getUserPhoneNumber(club.owner);
+
+  const members = ClubMembership.findAll({
     where: {
       club: club.id,
     },
-    order: [["createdAt", "DESC"]],
   });
 
-  // @ts-ignores
-  console.log(club.dataValues.posts);
+  const enrollments = ClubEmailEnrollment.findAll({
+    where: {
+      club: club.id,
+    },
+  });
 
-  const clubMetadata = JSON.parse(club.metadata);
+  const returnMembers: ClubMembershipBase[] = (await members).map((c) => {
+    return {
+      id: c.id,
+      manager: c.manager,
+      owner: c.phone_number === ownerPhoneNumber,
+      email: c.email,
+      firstName: c.first_name,
+      lastName: c.last_name,
+      // phone: c.phone_number,
+    };
+  });
 
-  const base: ClubBase = {
-    clubCode: club.club_code,
-    name: club.name,
-    picture: clubMetadata?.picture || "",
-    emoji: clubMetadata?.emoji || "",
-    heroColor: clubMetadata?.heroColor || "",
-    internalCode: club.internal_code,
-    verified: club.verified ?? false,
-    official: club.official ?? false,
-  };
-
-  const returnItem: Club = {
-    ...base,
-    // @ts-ignore
-    isMember: !!club.dataValues.isMember,
-    isOwner: club.owner === uid,
-    // @ts-ignore
-    isManager: !!club.dataValues.isManager,
-    // @ts-ignore
-    canManage: club.owner === uid || !!club.dataValues.isManager,
-    // @ts-ignore
-    memberCount: club.dataValues.memberCount,
-    posts: posts.map((p): ClubPost => {
+  const returnEnrollments: ClubEnrollmentBase[] = (await enrollments).map(
+    (c) => {
       return {
-        club: base,
-        content: p.content,
-        // @ts-ignore
-        postDate: p.dataValues.createdAt.getTime(),
-        link: p.link,
-        picture: p.picture,
-        eventDate: p.event_date?.getTime() ?? undefined,
+        email: c.email,
+        firstName: c.first_name,
+        lastName: c.last_name,
       };
-    }),
-    bio: clubMetadata?.bio || "",
-    link: clubMetadata?.link || "",
-  };
+    }
+  );
 
   res.send({
     result: "success",
-    club: returnItem,
+    club: club,
+    members: returnMembers,
+    enrollments: returnEnrollments,
   });
 }
