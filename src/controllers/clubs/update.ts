@@ -4,6 +4,7 @@ import { Club as ClubModel } from "../../models/Club";
 import { Club } from "scorecard-types";
 import getUserSchool from "../../private/school/getUserSchool";
 import { ClubMembership } from "../../models/ClubMembership";
+import { Sequelize } from "sequelize";
 
 export default async function updateClub(req: Request, res: Response) {
   const user = await requireAuth(req, res);
@@ -20,6 +21,32 @@ export default async function updateClub(req: Request, res: Response) {
         internal_code: club.internalCode,
       },
     ],
+    include: [
+      {
+        model: ClubMembership,
+        required: false,
+        where: {
+          phone_number: user.phone_number,
+        },
+        attributes: [],
+      },
+    ],
+    attributes: {
+      include: [
+        [
+          Sequelize.literal(`
+          EXISTS (
+            SELECT 1
+            FROM club_memberships AS ClubMembership
+            WHERE ClubMembership.club = Club.id
+            AND ClubMembership.manager = TRUE
+            AND ClubMembership.phone_number = '${user.phone_number}'
+          )
+        `),
+          "isManager",
+        ],
+      ],
+    },
   });
 
   if (!existing) {
@@ -27,7 +54,8 @@ export default async function updateClub(req: Request, res: Response) {
     return;
   }
 
-  if (existing.owner !== uid) {
+  // @ts-ignore
+  if (existing.owner !== uid && !existing.dataValues.isManager) {
     res.status(401).send("User does not have permission to edit club");
     return;
   }

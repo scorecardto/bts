@@ -52,6 +52,18 @@ export default async function listClubs(req: Request, res: Response) {
           ],
           [
             Sequelize.literal(`
+          EXISTS (
+            SELECT 1
+            FROM club_memberships AS ClubMembership
+            WHERE ClubMembership.club = Club.id
+            AND ClubMembership.manager = TRUE
+            AND ClubMembership.phone_number = '${user.phone_number}'
+          )
+        `),
+            "isManager",
+          ],
+          [
+            Sequelize.literal(`
               (
                 SELECT COUNT(*)
                 FROM club_memberships AS ClubMembership
@@ -77,7 +89,11 @@ export default async function listClubs(req: Request, res: Response) {
       official: cm.official,
       internalCode: cm.internal_code,
       // @ts-ignore
-      isMember: cm.dataValues.isMember,
+      isMember: !!cm.dataValues.isMember,
+      // @ts-ignore
+      isManager: !!cm.dataValues.isManager,
+      // @ts-ignore
+      canManage: cm.owner === uid || !!cm.dataValues.isManager,
       isOwner: cm.owner === uid,
       // @ts-ignore
       memberCount: cm.dataValues.memberCount,
