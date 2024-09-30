@@ -16,6 +16,10 @@ import {
   ClubEmailEnrollment,
   initializeClubEmailEnrollmentModel,
 } from "./ClubEmailEnrollment";
+import {
+  ClubUnsubscribeLink,
+  initializeClubUnsubscribeLinkModel,
+} from "./ClubUnsubscribeLink";
 
 export default function initializeModel() {
   const {
@@ -44,6 +48,7 @@ export default function initializeModel() {
   initializeFriendshipModel(sequelize);
 
   initializeClubModel(sequelize);
+
   initializeClubMembershipModel(sequelize);
   ClubMembership.belongsTo(Club);
   Club.hasMany(ClubMembership);
@@ -57,6 +62,10 @@ export default function initializeModel() {
 
   Club.belongsTo(School, { foreignKey: "school", targetKey: "unique_name" });
   School.hasMany(Club, { foreignKey: "school", sourceKey: "unique_name" });
+
+  initializeClubUnsubscribeLinkModel(sequelize);
+  ClubUnsubscribeLink.belongsTo(ClubPost);
+  ClubPost.hasMany(ClubUnsubscribeLink);
 
   initializeTextTransactionModel(sequelize);
 

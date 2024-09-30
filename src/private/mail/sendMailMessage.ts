@@ -2,6 +2,7 @@ import { SendBulkTemplatedEmailCommand, SESClient } from "@aws-sdk/client-ses";
 import { ClubPost } from "scorecard-types";
 import sesClient from "./sesClient";
 import sanitize from "sanitize-html";
+import { ClubUnsubscribeLink } from "../../models/ClubUnsubscribeLink";
 
 function clean(content: string) {
   return sanitize(content, {
@@ -10,33 +11,36 @@ function clean(content: string) {
   });
 }
 export default async function sendMailMessage(
-  to: string[],
+  to: ClubUnsubscribeLink[],
   post: ClubPost
 ): Promise<any> {
-  let template = post.club.picture
-    ? "club_post_notification_with_pfp"
-    : "club_post_notification";
+  let template = "v2_club_post_notification";
 
   const templateData: any = {
     content: clean(post.content),
     club_name: clean(post.club.name),
     // i guess just trust this
     club_code: post.club.clubCode,
-    club_picture: post.club.picture,
+    club_picture_url: post.club.picture
+      ? `https://api.scorecardgrades.com/v1/images/get/${post.club.picture}`
+      : `https://api.scorecardgrades.com/api/image?source=clubPicture&internalCode=${post.club.internalCode}`,
   };
 
   if (post.picture) {
-    templateData["picture"] = post.picture;
-    template = post.club.picture
-      ? "club_post_notification_with_image_pfp"
-      : "club_post_notification_with_image";
+    templateData[
+      "picture_url"
+    ] = `https://scorecardgrades.com/v1/images/get/${post.picture}`;
+    template = "v2_club_post_notification_with_image";
   }
 
   const sendTemplatedEmailCommand = new SendBulkTemplatedEmailCommand({
     Destinations: to.map((a) => {
       return {
+        ReplacementTemplateData: JSON.stringify({
+          unsubscribe_link: `https://www.scorecardgrades.com/unsubscribe/${a.code}`,
+        }),
         Destination: {
-          ToAddresses: [a],
+          ToAddresses: [a.email],
         },
       };
     }),

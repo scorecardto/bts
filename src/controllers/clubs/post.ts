@@ -81,19 +81,17 @@ export default async function createClubPost(req: Request, res: Response) {
     return;
   }
 
-  if (club.internalCode) {
-    await ClubPost.create({
-      club: existing.id,
-      content: `${content}` || " ",
-      event_date: eventDate,
-      promotion_option: promotionOption,
-      link: link ? `${link}` : undefined,
-      picture: picture ? `${picture}` : undefined,
-    });
-  }
+  const postInDb = await ClubPost.create({
+    club: existing.id,
+    content: `${content}` || " ",
+    event_date: eventDate,
+    promotion_option: promotionOption,
+    link: link ? `${link}` : undefined,
+    picture: picture ? `${picture}` : undefined,
+  });
 
   if (promotionOption === "PROMOTE") {
-    createClubMassMail(post, existing.id);
+    createClubMassMail(post, existing.id, postInDb.id);
     createClubMassText(post, existing.id);
   }
 
