@@ -44,6 +44,7 @@ export default async function getUnsubscribePreview(
 
   return res.send({
     result: "success",
+    internalCode: club.internal_code,
     clubPicture: picture,
     emoji,
     heroColor,
