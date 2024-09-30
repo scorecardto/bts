@@ -23,13 +23,13 @@ export default async function sendMailMessage(
     club_code: post.club.clubCode,
     club_picture_url: post.club.picture
       ? `https://api.scorecardgrades.com/v1/images/get/${post.club.picture}`
-      : `https://api.scorecardgrades.com/api/image?source=clubPicture&internalCode=${post.club.internalCode}`,
+      : `https://scorecardgrades.com/api/image?source=clubPicture&internalCode=${post.club.internalCode}`,
   };
 
   if (post.picture) {
     templateData[
       "picture_url"
-    ] = `https://scorecardgrades.com/v1/images/get/${post.picture}`;
+    ] = `https://api.scorecardgrades.com/v1/images/get/${post.picture}`;
     template = "v2_club_post_notification_with_image";
   }
 
