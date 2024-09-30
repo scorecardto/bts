@@ -9,10 +9,23 @@ import { Club } from "../../models/Club";
 import { validate } from "email-validator";
 import sendMailMessage from "./sendMailMessage";
 import { ClubEmailEnrollment } from "../../models/ClubEmailEnrollment";
+import { ClubUnsubscribeLink } from "../../models/ClubUnsubscribeLink";
+
+function generateShortCode() {
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let shortCode = "";
+  for (let i = 0; i < 16; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    shortCode += characters[randomIndex];
+  }
+  return shortCode;
+}
 
 export default async function createClubMassMail(
   post: ClubPostInternal,
-  clubId: number
+  clubId: number,
+  postId: number
 ) {
   console.log("creating a mass mail for " + post.club.name + "...");
 
@@ -51,8 +64,16 @@ export default async function createClubMassMail(
   if (email_list.size >= 1) {
     const email_array = [...email_list];
 
-    console.log(email_array);
+    const results = await ClubUnsubscribeLink.bulkCreate(
+      email_array.map((a) => {
+        return {
+          email: a,
+          code: generateShortCode(),
+          post: postId,
+        };
+      })
+    );
 
-    sendMailMessage(email_array, post);
+    sendMailMessage(results, post);
   }
 }
