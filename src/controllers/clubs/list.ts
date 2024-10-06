@@ -99,9 +99,9 @@ export default async function listClubs(req: Request, res: Response) {
       memberCount: cm.dataValues.memberCount,
       picture: metadata.picture,
       bio: metadata.bio,
-      heroColor: metadata.heroColor,
+      heroColor: metadata.heroColor || "#4A93FF",
       link: metadata.link,
-      emoji: metadata.emoji,
+      emoji: metadata.emoji || "🙂",
       posts: [],
     };
   });
