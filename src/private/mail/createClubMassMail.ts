@@ -25,7 +25,8 @@ function generateShortCode() {
 export default async function createClubMassMail(
   post: ClubPostInternal,
   clubId: number,
-  postId: number
+  postId: number,
+  subject: string
 ) {
   console.log("creating a mass mail for " + post.club.name + "...");
 
@@ -74,6 +75,6 @@ export default async function createClubMassMail(
       })
     );
 
-    sendMailMessage(results, post);
+    sendMailMessage(results, post, subject);
   }
 }
