@@ -18,6 +18,13 @@ export default async function createClubPost(req: Request, res: Response) {
   if (!user) return;
 
   // @ts-ignore
+  const disableEmail: boolean = !!req.fields?.disableEmail;
+  // @ts-ignore
+  const disableSMS: boolean = !!req.fields?.disableSMS;
+  // @ts-ignore
+  const disablePush: boolean = !!req.fields?.disablePush;
+
+  // @ts-ignore
   const customSubject: string = req.fields?.subject;
 
   // @ts-ignore
@@ -96,22 +103,28 @@ export default async function createClubPost(req: Request, res: Response) {
   });
 
   if (promotionOption === "PROMOTE") {
-    createClubMassMail(
-      post,
-      existing.id,
-      postInDb.id,
-      customSubject
-        ? smartTruncate(customSubject, 64)
-        : `New Announcement in #${existing.club_code}`
-    ).catch(() => {
-      console.log("mass mail failed");
-    });
-    createClubMassText(post, existing.id).catch(() => {
-      console.log("mass text failed");
-    });
-    createClubMassPush(post, existing.id).catch(() => {
-      console.log("mass push failed");
-    });
+    if (!disableEmail) {
+      createClubMassMail(
+        post,
+        existing.id,
+        postInDb.id,
+        customSubject
+          ? smartTruncate(customSubject, 64)
+          : `New Announcement in #${existing.club_code}`
+      ).catch(() => {
+        console.log("mass mail failed");
+      });
+    }
+    if (!disableSMS) {
+      createClubMassText(post, existing.id).catch(() => {
+        console.log("mass text failed");
+      });
+    }
+    if (!disablePush) {
+      createClubMassPush(post, existing.id).catch(() => {
+        console.log("mass push failed");
+      });
+    }
   }
 
   res.send({
