@@ -35,28 +35,29 @@ export default async function sendMailMessage(
     template = "v3_club_post_notification_with_image";
   }
 
-  const sendTemplatedEmailCommand = new SendBulkTemplatedEmailCommand({
-    Destinations: to.map((a) => {
-      return {
-        ReplacementTemplateData: JSON.stringify({
-          unsubscribe_link: `https://www.scorecardgrades.com/unsubscribe/${a.code}`,
-        }),
-        Destination: {
-          ToAddresses: [a.email],
-        },
-      };
-    }),
-    Source: `${post.club.name} <${process.env.SES_SENDER!}>`,
-    Template: template,
-    DefaultTemplateData: JSON.stringify(templateData),
-  });
+  for (let i = 0; i < to.length; i += 50) {
+    const sendTemplatedEmailCommand = new SendBulkTemplatedEmailCommand({
+      Destinations: to.slice(i, i + 50).map((a) => {
+        return {
+          ReplacementTemplateData: JSON.stringify({
+            unsubscribe_link: `https://www.scorecardgrades.com/unsubscribe/${a.code}`,
+          }),
+          Destination: {
+            ToAddresses: [a.email],
+          },
+        };
+      }),
+      Source: `${post.club.name} <${process.env.SES_SENDER!}>`,
+      Template: template,
+      DefaultTemplateData: JSON.stringify(templateData),
+    });
 
-  try {
-    const res = await sesClient.send(sendTemplatedEmailCommand);
-    console.log(res);
-  } catch (e) {
-    console.error(e);
+    try {
+      const res = await sesClient.send(sendTemplatedEmailCommand);
+      console.log(res);
+    } catch (e) {
+      console.error(e);
+    }
   }
-
   console.log("sending");
 }
