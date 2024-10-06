@@ -12,13 +12,15 @@ function clean(content: string) {
 }
 export default async function sendMailMessage(
   to: ClubUnsubscribeLink[],
-  post: ClubPost
+  post: ClubPost,
+  subject: string
 ): Promise<any> {
-  let template = "v2_club_post_notification";
+  let template = "v3_club_post_notification";
 
   const templateData: any = {
     content: clean(post.content),
     club_name: clean(post.club.name),
+    subject: clean(subject || ""),
     // i guess just trust this
     club_code: post.club.clubCode,
     club_picture_url: post.club.picture
@@ -30,7 +32,7 @@ export default async function sendMailMessage(
     templateData[
       "picture_url"
     ] = `https://api.scorecardgrades.com/v1/images/get/${post.picture}`;
-    template = "v2_club_post_notification_with_image";
+    template = "v3_club_post_notification_with_image";
   }
 
   const sendTemplatedEmailCommand = new SendBulkTemplatedEmailCommand({

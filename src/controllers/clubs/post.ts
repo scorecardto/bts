@@ -8,12 +8,17 @@ import sendMailMessage from "../../private/mail/sendMailMessage";
 import createClubMassMail from "../../private/mail/createClubMassMail";
 import { Sequelize } from "sequelize";
 import { ClubMembership } from "../../models/ClubMembership";
+import createClubMassPush from "../../private/push/createClubMassPush";
+import smartTruncate from "smart-truncate";
 
 export default async function createClubPost(req: Request, res: Response) {
   const VALID_OPTIONS = ["BASIC", "PROMOTE"];
 
   const user = await requireAuth(req, res);
   if (!user) return;
+
+  // @ts-ignore
+  const customSubject: string = req.fields?.subject;
 
   // @ts-ignore
   const post: ClubPostInternal | null = req.fields?.post;
@@ -91,8 +96,22 @@ export default async function createClubPost(req: Request, res: Response) {
   });
 
   if (promotionOption === "PROMOTE") {
-    createClubMassMail(post, existing.id, postInDb.id);
-    createClubMassText(post, existing.id);
+    createClubMassMail(
+      post,
+      existing.id,
+      postInDb.id,
+      customSubject
+        ? smartTruncate(customSubject, 64)
+        : `New Announcement in #${existing.club_code}`
+    ).catch(() => {
+      console.log("mass mail failed");
+    });
+    createClubMassText(post, existing.id).catch(() => {
+      console.log("mass text failed");
+    });
+    createClubMassPush(post, existing.id).catch(() => {
+      console.log("mass push failed");
+    });
   }
 
   res.send({

@@ -3,10 +3,11 @@ import GraphemeSplitter from "grapheme-splitter";
 import smartTruncate from "smart-truncate";
 import getUsers from "../auth/getUsers";
 import { ClubMembership } from "../../models/ClubMembership";
-import sendMessage from "./sendTextMessage";
 import { TextTransaction } from "../../models/TextTransaction";
 import { Op, Sequelize } from "sequelize";
 import sendPushNotifications from "../push/sendPushNotifications";
+import phone from "phone";
+import axios from "axios";
 
 const IGNORE_IS_USER = true;
 const MAX_FREE_TEXTS = 3;
@@ -34,13 +35,15 @@ async function getContacts(clubId: number): Promise<Contact[]> {
     where: { club: clubId },
   });
 
-  return memberships.map(member => {return {
-    phoneNumber: member.phone_number,
-    firstName: member.first_name,
-    lastName: member.last_name,
-    numberTextsSent: -1,
-    fbToken: users.find((u) => u.phoneNumber === member.phone_number)?.uid,
-  }});
+  return memberships.map((member) => {
+    return {
+      phoneNumber: member.phone_number,
+      firstName: member.first_name,
+      lastName: member.last_name,
+      numberTextsSent: -1,
+      fbToken: users.find((u) => u.phoneNumber === member.phone_number)?.uid,
+    };
+  });
 }
 
 async function aggregateTextCount(contacts: Contact[]): Promise<Contact[]> {
@@ -83,44 +86,124 @@ export default async function createClubMassText(
   const emoji = validateEmoji(emoji_raw) ? emoji_raw : "🙂";
   const hashtag = `#${post.club.clubCode.substring(0, 10).toLowerCase()}`;
 
-  const truncatedMessage = smartTruncate(post.content, 150);
-
   // ROUGH EST. you get at least 167 characters
   const leadMessage = `${emoji} From ${hashtag}: ${post.content}`;
 
   const contacts = await getContacts(clubId);
 
-  const toText = await sendPushNotifications(post.club.internalCode,
-      `[${emoji}] New in #${post.club.clubCode}`,
-      smartTruncate(post.content, 144), contacts.map(c => c.fbToken));
-
-  // TODO: send text messages to everyone else (API currently not verified, so this is disabled)
-  return
-
-  const finalContacts = await aggregateTextCount(contacts.filter((_, i) => toText.includes(i)));
+  const finalContacts = await aggregateTextCount(contacts);
 
   const transactionReceipts: any[] = [];
 
-  for (let c of finalContacts) {
-    let message = "";
+  const messageForUsers = `${smartTruncate(
+    leadMessage,
+    190
+  )}\n--\nOpen Scorecard App to see full post with images.`;
 
-    if (c.numberTextsSent === MAX_FREE_TEXTS) {
-      const nameUsed = c.firstName
-        ? `${c.firstName?.substring(0, 12)},` // 13
-        : "Heads up:";
-      const footer = `\n--\nTo join more clubs and manage classes, use the Scorecard app at https://scorecardgrades.com/`; // 98
-      const quote = `${"“"}${smartTruncate(leadMessage, 200)}${"”"}`; // 2 + 200
-      // 13 + 98 + 2 + 200 = 313
-      message = `${nameUsed} this is the last message we're sending you by text: ${quote}${footer}`;
-    } else {
-      message = `${smartTruncate(
-        leadMessage,
-        190
-      )}\n--\nTo see this post in full, download Scorecard at https://scorecardgrades.com/ . You can also manage classes and create clubs!`;
-      // 320 - 130 = 190
+  const messageForNonUsers = `${smartTruncate(
+    leadMessage,
+    190
+  )}\n--\nTo see this post in full, download Scorecard at https://scorecardgrades.com/ . You can also manage classes and create clubs!`;
+
+  const userList: string[] = [];
+
+  const nonUserList: string[] = [];
+
+  finalContacts.forEach((c) => {
+    const phoneNumberFormatted = phone(c.phoneNumber);
+
+    if (
+      !phoneNumberFormatted.isValid ||
+      phoneNumberFormatted.countryCode !== "+1"
+    ) {
+      return;
     }
-    const t = await sendMessage(message, c.phoneNumber);
-    transactionReceipts.push(t);
+
+    if (c.fbToken) {
+      userList.push(phoneNumberFormatted.phoneNumber);
+      transactionReceipts.push({
+        message: messageForUsers,
+        phoneNumber: phoneNumberFormatted.phoneNumber,
+      });
+    } else {
+      nonUserList.push(phoneNumberFormatted.phoneNumber);
+      transactionReceipts.push({
+        message: messageForNonUsers,
+        phoneNumber: phoneNumberFormatted.phoneNumber,
+      });
+    }
+  });
+
+  const apiKey = process.env.TEXTBEE_API_KEY;
+  const device = process.env.TEXTBEE_DEVICE_ID;
+
+  if (nonUserList.length >= 1) {
+    console.log("sending to non users: <<" + messageForNonUsers + ">>");
+
+    axios.post(
+      `https://api.textbee.dev/api/v1/gateway/devices/${device}/sendSMS`,
+      {
+        message: messageForNonUsers,
+        recipients: nonUserList,
+      },
+      {
+        headers: {
+          "x-api-key": apiKey,
+        },
+      }
+    );
   }
+  if (userList.length >= 1) {
+    console.log("sending to users: <<" + messageForUsers + ">>");
+
+    axios.post(
+      `https://api.textbee.dev/api/v1/gateway/devices/${device}/sendSMS`,
+      {
+        message: messageForUsers,
+        recipients: userList,
+      },
+      {
+        headers: {
+          "x-api-key": apiKey,
+        },
+      }
+    );
+  }
+  // for (let c of finalContacts) {
+  //   let message = "";
+
+  //   if (c.fbToken) {
+  //     message = `${smartTruncate(
+  //       leadMessage,
+  //       190
+  //     )}\n--\nOpen Scorecard App to see full post with images.`;
+  //   } else {
+  //     message = `${smartTruncate(
+  //       leadMessage,
+  //       190
+  //     )}\n--\nTo see this post in full, download Scorecard at https://scorecardgrades.com/ . You can also manage classes and create clubs!`;
+  //   }
+  // }
+  // for (let c of finalContacts) {
+  //   let message = "";
+
+  //   if (c.numberTextsSent === MAX_FREE_TEXTS) {
+  //     const nameUsed = c.firstName
+  //       ? `${c.firstName?.substring(0, 12)},` // 13
+  //       : "Heads up:";
+  //     const footer = `\n--\nTo join more clubs and manage classes, use the Scorecard app at https://scorecardgrades.com/`; // 98
+  //     const quote = `${"“"}${smartTruncate(leadMessage, 200)}${"”"}`; // 2 + 200
+  //     // 13 + 98 + 2 + 200 = 313
+  //     message = `${nameUsed} this is the last message we're sending you by text: ${quote}${footer}`;
+  //   } else {
+  //     message = `${smartTruncate(
+  //       leadMessage,
+  //       190
+  //     )}\n--\nTo see this post in full, download Scorecard at https://scorecardgrades.com/ . You can also manage classes and create clubs!`;
+  //     // 320 - 130 = 190
+  //   }
+  //   const t = await sendMessage(message, c.phoneNumber);
+  //   transactionReceipts.push(t);
+  // }
   TextTransaction.bulkCreate(transactionReceipts);
 }
