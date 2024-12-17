@@ -32,6 +32,7 @@ import changeMember from "./controllers/clubs/changeMember";
 import changeEmail from "./controllers/clubs/changeEmail";
 import unsubscribe from "./controllers/clubs/public/unsubscribe";
 import getUnsubscribePreview from "./controllers/clubs/public/unsubscribePreview";
+import deleteClub from "./controllers/clubs/delete";
 
 dotenv.config();
 
@@ -68,6 +69,7 @@ app.get("/v1/clubs/members", getMembers);
 app.post("/v1/clubs/changeMember", changeMember);
 app.get("/v1/clubs/search", searchClubs);
 app.post("/v1/clubs/update", updateClub);
+app.post("/v1/clubs/delete", deleteClub);
 app.post("/v1/clubs/post", createClubPost);
 app.get("/v1/clubs/public/clubDownloadPromo", getClubDownloadPromo);
 app.post("/v1/clubs/public/join", joinClubPublic);
