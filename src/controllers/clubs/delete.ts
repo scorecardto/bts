@@ -14,14 +14,14 @@ export default async function deleteClub(req: Request, res: Response) {
   if (!user) return;
 
   // @ts-ignore
-  const club: Club = req.fields?.club;
+  const internal_code = req.fields?.internalCode;
 
   const uid = user.uid;
 
   const existing = await ClubModel.findOne({
     where: [
       {
-        internal_code: club.internalCode,
+        internal_code: internal_code,
       },
     ],
     include: [
