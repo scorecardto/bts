@@ -74,7 +74,7 @@ export default async function deleteClub(req: Request, res: Response) {
       club: existing.id,
     }}))) {
     (await ClubUnsubscribeLink.findAll({where: {
-        id: post.id,
+        post: post.id,
       }})).forEach(m => m.destroy());
   }
   (await ClubPost.findAll({where: {
