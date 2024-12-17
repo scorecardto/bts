@@ -70,18 +70,18 @@ export default async function deleteClub(req: Request, res: Response) {
       club: existing.id,
   }})).forEach(m => m.destroy());
 
-  const totalIds: number[] = [];
+  for (const post of (await ClubPost.findAll({where: {
+      club: existing.id,
+    }}))) {
+    (await ClubUnsubscribeLink.findAll({where: {
+        id: post.id,
+      }})).forEach(m => m.destroy());
+  }
   (await ClubPost.findAll({where: {
       club: existing.id,
   }})).forEach(m => {
-    totalIds.push(m.id);
     m.destroy()
   });
-  for (const id of totalIds) {
-    (await ClubUnsubscribeLink.findAll({where: {
-        id: id,
-      }})).forEach(m => m.destroy());
-  }
   await existing.destroy();
 
   res.send({
