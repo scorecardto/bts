@@ -29,6 +29,7 @@ import onboardClub from "./controllers/clubs/onboardClub";
 import courseGlyphs from "./controllers/static/courseGlyphs";
 import getMembers from "./controllers/clubs/members";
 import changeMember from "./controllers/clubs/changeMember";
+import changeEmail from "./controllers/clubs/changeEmail";
 
 dotenv.config();
 
@@ -54,6 +55,7 @@ app.use((err, req, res, next) => {
 
 app.post("/v1/school/status", updateSchoolStatus);
 app.post("/v1/clubs/checkClubCode", checkTicker);
+app.post("/v1/clubs/changeEmail", changeEmail);
 app.post("/v1/clubs/create", createClub);
 app.post("/v1/clubs/join", joinClub);
 app.get("/v1/clubs/list", listClubs);
