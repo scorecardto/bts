@@ -30,6 +30,8 @@ import courseGlyphs from "./controllers/static/courseGlyphs";
 import getMembers from "./controllers/clubs/members";
 import changeMember from "./controllers/clubs/changeMember";
 import changeEmail from "./controllers/clubs/changeEmail";
+import unsubscribe from "./controllers/clubs/public/unsubscribe";
+import getUnsubscribePreview from "./controllers/clubs/public/unsubscribePreview";
 
 dotenv.config();
 
@@ -53,6 +55,8 @@ app.use((err, req, res, next) => {
   return res.status(500).json({ error: "Something went wrong!" });
 });
 
+app.post("/v1/public/unsubscribe", unsubscribe);
+app.get("/v1/public/unsubscribePreview", getUnsubscribePreview);
 app.post("/v1/school/status", updateSchoolStatus);
 app.post("/v1/clubs/checkClubCode", checkTicker);
 app.post("/v1/clubs/changeEmail", changeEmail);

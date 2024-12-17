@@ -14,8 +14,6 @@ class TextTransaction extends Model<
   declare id: CreationOptional<number>;
   declare phone_number: string;
   declare message: string;
-  declare success: boolean;
-  declare result: CreationOptional<string>;
 }
 
 function initializeTextTransactionModel(sequelize: Sequelize) {
@@ -31,12 +29,6 @@ function initializeTextTransactionModel(sequelize: Sequelize) {
         type: DataTypes.STRING,
       },
       message: {
-        type: DataTypes.STRING,
-      },
-      success: {
-        type: DataTypes.BOOLEAN,
-      },
-      result: {
         type: DataTypes.STRING,
       },
     },

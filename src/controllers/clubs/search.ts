@@ -45,8 +45,8 @@ export default async function searchClubs(req: Request, res: Response) {
       schoolCode: schoolValues?.short_code ?? undefined,
       schoolName: schoolValues?.display_name ?? undefined,
       clubPicture: JSON.parse(cm.metadata).picture ?? "",
-      emoji: JSON.parse(cm.metadata).emoji ?? "",
-      heroColor: JSON.parse(cm.metadata).heroColor ?? "",
+      emoji: JSON.parse(cm.metadata).emoji ?? "🙂",
+      heroColor: JSON.parse(cm.metadata).heroColor ?? "#4A93FF",
     };
   });
 

@@ -83,6 +83,8 @@ function initializeClubModel(sequelize: Sequelize) {
   );
 
   Club.beforeCreate(async (instance) => {
+    console.log("running before create operation");
+
     console.log(instance);
     let code;
     let isUnique = false;
