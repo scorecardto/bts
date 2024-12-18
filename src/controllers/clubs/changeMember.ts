@@ -11,8 +11,8 @@ export default async function changeMember(req: Request, res: Response) {
 
   const internal_code = `${req.fields?.internalCode}`;
   const action = `${req.fields?.action}`;
-  const membershipId = `${req.fields?.membershipId}`;
-  const enrollmentEmail = `${req.fields?.enrollmentEmail}`;
+  const membershipId = `${req.fields?.membershipId || ''}`;
+  const enrollmentEmail = `${req.fields?.enrollmentEmail || ''}`;
 
   if (membershipId && enrollmentEmail) {
     res.status(400).send("Cannot provide both membership and email enrollment");
