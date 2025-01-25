@@ -80,6 +80,8 @@ export default async function createClubMassText(
   post: ClubPostInternal,
   clubId: number
 ) {
+  const HIDE_WATERMARKS = post.club.official;
+
   console.log("creating a mass text for " + post.club.name + "...");
 
   const emoji_raw = post.club.emoji || "🙂";
@@ -95,15 +97,17 @@ export default async function createClubMassText(
 
   const transactionReceipts: any[] = [];
 
-  const messageForUsers = `${smartTruncate(
-    leadMessage,
-    190
-  )}\n--\nOpen Scorecard App to see full post with images.`;
+  const messageForUsers = `${smartTruncate(leadMessage, 190)}${
+    HIDE_WATERMARKS
+      ? ""
+      : "\n--\nOpen Scorecard App to see full post with images."
+  }`;
 
-  const messageForNonUsers = `${smartTruncate(
-    leadMessage,
-    190
-  )}\n--\nTo see this post in full, download Scorecard at https://scorecardgrades.com/ . You can also manage classes and create clubs!`;
+  const messageForNonUsers = `${smartTruncate(leadMessage, 190)}${
+    HIDE_WATERMARKS
+      ? ""
+      : "\n--\nTo see this post in full, download Scorecard at https://scorecardgrades.com/ . You can also manage classes and create clubs!"
+  }`;
 
   const userList: string[] = [];
 
